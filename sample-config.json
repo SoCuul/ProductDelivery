@@ -1,0 +1,17 @@
+{
+  "token": "",
+  "prefix": "",
+  "botName": "",
+  "embedColor": "",
+  
+  "ownerID": "",
+
+  "activityType": "",
+  "activityStatus": "",
+
+  "dbType": "",
+
+  "mongoCollection": "",
+  "mongoClusterName": "",
+  "mongoURL": ""
+}
