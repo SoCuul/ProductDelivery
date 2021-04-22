@@ -1,24 +1,33 @@
 module.exports = {
   aliases: ['recieve'],
-	async run(client, message, args, sendError) {
+	async run(client, message, args, sendError, getUserInfo, getRobloxInfo) {
     const Discord = require("discord.js");
     let productname = args.join(' ')
 
+    //Check Verification
+    let userInfo = await getRobloxInfo(message.author.id)
+    const unverified = new Discord.MessageEmbed()
+    .setTitle('Unverified')
+    .setDescription(`There is no Roblox account linked to this Discord account.\nRun the \`${client.config.prefix}link\` command to link your Roblox account.`)
+    if(!userInfo.verified) return message.channel.send(unverified)
+
     if(!productname) return sendError('What product should I retrieve for you? (Case-Sensitive)||retrieve <productname>')
 
-    await client.usersdb.ensure(`${message.author.id}`, {})
-    await client.usersdb.ensure(`${message.author.id}.${message.guild.id}`, [])
+    await client.usersdb.ensure(`${userInfo.robloxID}`, {})
+    await client.usersdb.ensure(`${userInfo.robloxID}.${message.guild.id}`, [])
     await client.products.ensure(message.guild.id, {})
 
-    if(await client.products.get(`${message.guild.id}.${productname}`)){
-      let yourproducts = await client.usersdb.get(`${message.author.id}.${message.guild.id}`)
+    let product = await client.products.get(`${message.guild.id}.${productname}`)
+
+    if(product){
+      let yourproducts = await client.usersdb.get(`${userInfo.robloxID}.${message.guild.id}`)
       if(yourproducts.includes(productname)){
         await message.channel.send('Sent.')
 
         const embed = new Discord.MessageEmbed()
         .setColor('BLACK')
-        .setTitle(await client.products.get(`${message.guild.id}.${productname}.name`))
-        .addField('Download Link:', await client.products.get(`${message.guild.id}.${productname}.file`))
+        .setTitle(product.name)
+        .addField('Download Link:', product.file)
         .setFooter(message.guild.name, message.guild.iconURL())
     
         await message.member.send(embed).catch(error => { message.channel.send(`❌ I could not send you the file. Make sure you dms are open, and try the command again.`) })

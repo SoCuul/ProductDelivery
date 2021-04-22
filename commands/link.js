@@ -1,5 +1,5 @@
 module.exports = {
-    aliases: [],
+    aliases: ['linkaccount'],
     async run(client, message, args, sendError, getUserInfo) {
         const Discord = require("discord.js");
         const axios = require("axios");
@@ -37,7 +37,7 @@ module.exports = {
                 .setColor('RED')
                 .setTitle('Already Linked')
                 .setDescription(`**${args[0]}** has already been verified under a different Discord account.\nPlease try to link another Roblox account.`)
-                let existingUserInfo = await getUserInfo(checkusername.data.data[0].id)
+                let existingUserInfo = await getUserInfo(`${checkusername.data.data[0].id}`)
                 if(existingUserInfo.verified) return verifymsg.edit(alreadyverified)
 
                 //Lookup Roblox user information
@@ -54,7 +54,7 @@ module.exports = {
 					for (i in splitid){
 						encodedid.push(encodingarray[splitid[i]])
 					}
-					let verificationcode = encodedid.join(' ')
+					let verificationcode = encodedid.join(' ') || 'Verification Code: ' + endodedid.join(' ')
 
 					if(response.data.description === verificationcode){
                         //Save to database
@@ -68,7 +68,7 @@ module.exports = {
 						.setColor('GREEN')
 						.setTitle(`Link Account`)
 						.setDescription(`Your account has been linked.\nLinked Account: [**${response.data.name}**](https://www.roblox.com/users/${response.data.id}/profile)\nYou can now remove the verification text from your profile.`)
-						.setThumbnail(`http://www.roblox.com/Thumbs/Avatar.ashx?x=600&y=600&Format=Png&username=${response.data.name}`)
+						.setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${response.data.id}&width=420&height=420&format=png`)
 						verifymsg.edit(successembed)
 					}else{
 						const failureembed = new Discord.MessageEmbed()

@@ -18,6 +18,8 @@ module.exports = {
       .setColor('RED')
       .setTitle('Product Deleted')
       .addField('Name', await client.products.get(`${message.guild.id}.${productname}.name`))
+      .addField('Description', await client.products.get(`${message.guild.id}.${productname}.description`))
+      .addField('Developer Product ID', await client.products.get(`${message.guild.id}.${productname}.productid`))
       .addField('File', await client.products.get(`${message.guild.id}.${productname}.file`))
       await message.channel.send(embed)
 

@@ -17,55 +17,8 @@ module.exports = (client, message) => {
     message.channel.send(error)
   }
 
-  //Get User Information from Roblox ID
-  async function getUserInfo (inputRobloxID) {
-    let userInfo = await client.robloxLink.find(value => value.robloxID === inputRobloxID)
-    if(userInfo){
-      var discordID = Object.keys(userInfo)[0]
-    }else{
-      return {
-        "verified": false
-      }
-    }
-
-    await client.robloxLink.ensure(discordID, {})
-
-    let robloxID = await client.robloxLink.get(`${discordID}.robloxID`)
-    let robloxUsername = await client.robloxLink.get(`${discordID}.robloxUsername`)
-
-    if(robloxID && robloxUsername){
-      return {
-        "verified": true,
-        "discordID": discordID,
-        "robloxID": await client.robloxLink.get(`${discordID}.robloxID`),
-        "robloxUsername": await client.robloxLink.get(`${discordID}.robloxUsername`)
-      }
-    }else{
-      return {
-        "verified": false
-      }
-    }
-  }
-
-  //Get Roblox Information from Discord ID
-  async function getRobloxInfo (discordID) {
-    await client.robloxLink.ensure(discordID, {})
-
-    let robloxID = await client.robloxLink.get(`${discordID}.robloxID`)
-    let robloxUsername = await client.robloxLink.get(`${discordID}.robloxUsername`)
-
-    if(robloxID && robloxUsername){
-      return {
-        "verified": true,
-        "robloxID": await client.robloxLink.get(`${discordID}.robloxID`),
-        "robloxUsername": await client.robloxLink.get(`${discordID}.robloxUsername`)
-      }
-    }else{
-      return {
-        "verified": false
-      }
-    }
-  }
+  let getUserInfo = client.getUserInfo
+  let getRobloxInfo = client.getRobloxInfo
 
   // Ignore all bots
   if (message.author.bot) return;

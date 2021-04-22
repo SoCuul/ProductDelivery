@@ -5,9 +5,8 @@ module.exports = {
             const { inspect } = require('util');
             let evaled;
             try {
+                console.log(`Eval executed by ${message.author.tag}`)
                 evaled = eval(args.join(' '))
-                //message.channel.send(inspect(evaled));
-                console.log(`Eval executed by ${message.author.username}`);
             }
             catch (error) {
                 message.channel.send('❌ There was an error during evaluation.');
