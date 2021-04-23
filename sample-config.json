@@ -1,8 +1,10 @@
 {
   "token": "",
-  "prefix": "",
+  "defaultPrefix": "",
   "botName": "",
-  "embedColor": "",
+  "mainEmbedColor": "",
+
+  "showProfileRobloxID": true,
   
   "ownerID": "",
 

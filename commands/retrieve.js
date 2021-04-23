@@ -4,11 +4,19 @@ module.exports = {
     const Discord = require("discord.js");
     let productname = args.join(' ')
 
+    //Ensure data
+    await client.guildSettings.ensure(message.guild.id, {
+      prefix: client.config.defaultPrefix
+    })
+
+    //Prefix fetching code
+    let prefix = await client.guildSettings.get(`${message.guild.id}.prefix`)
+
     //Check Verification
     let userInfo = await getRobloxInfo(message.author.id)
     const unverified = new Discord.MessageEmbed()
     .setTitle('Unverified')
-    .setDescription(`There is no Roblox account linked to this Discord account.\nRun the \`${client.config.prefix}link\` command to link your Roblox account.`)
+    .setDescription(`There is no Roblox account linked to this Discord account.\nRun the \`${prefix}link\` command to link your Roblox account.`)
     if(!userInfo.verified) return message.channel.send(unverified)
 
     if(!productname) return sendError('What product should I retrieve for you? (Case-Sensitive)||retrieve <productname>')
@@ -25,7 +33,7 @@ module.exports = {
         await message.channel.send('Sent.')
 
         const embed = new Discord.MessageEmbed()
-        .setColor('BLACK')
+        .setColor(client.config.mainEmbedColor)
         .setTitle(product.name)
         .addField('Download Link:', product.file)
         .setFooter(message.guild.name, message.guild.iconURL())

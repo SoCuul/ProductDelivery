@@ -1,6 +1,14 @@
-module.exports = (client, message) => {
+module.exports = async (client, message) => {
   //Ignore commands in dm channels
   if (message.channel.type === 'dm' ) return;
+
+  //Ensure data
+  await client.guildSettings.ensure(message.guild.id, {
+    prefix: client.config.defaultPrefix
+  })
+
+  //Prefix fetching code
+  let prefix = await client.guildSettings.get(`${message.guild.id}.prefix`)
 
 	//Error Messages
 	function sendError(input) {
@@ -11,7 +19,7 @@ module.exports = (client, message) => {
     .setColor('RED')
     .setTitle('Error')
     .setDescription(parts[0])
-    .addField('Usage', `${errortick}${client.config.prefix}${parts[1]}${errortick}`)
+    .addField('Usage', `${errortick}${prefix}${parts[1]}${errortick}`)
     .setFooter(client.config.botName, client.user.avatarURL({ dynamic: true }));
     message.react('❌').catch(error => { console.log(`There was an error reacting to the message.`) })
     message.channel.send(error)
@@ -24,11 +32,11 @@ module.exports = (client, message) => {
   if (message.author.bot) return;
 
   // Ignore messages without prefixes
-  const cmdPrefix = message.content.startsWith(client.config.prefix);
+  const cmdPrefix = message.content.startsWith(prefix);
   if (!cmdPrefix) return;
 
   // Our standard argument/command name definition.
-  const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
+  const args = message.content.slice(prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
   // Grab the command data from the client.commands map

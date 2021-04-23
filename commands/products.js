@@ -12,7 +12,7 @@ module.exports = {
     }
 
     const embed = new Discord.MessageEmbed()
-    .setColor('BLACK')
+    .setColor(client.config.mainEmbedColor)
     .setTitle('Products')
     .setDescription(productnames.join('\n') || '**None**')
     .setTimestamp()

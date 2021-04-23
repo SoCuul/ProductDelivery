@@ -26,12 +26,39 @@ module.exports = {
         await client.usersdb.remove(`${userInfo.robloxID}.${message.guild.id}`, productname)
 
         const embed = new Discord.MessageEmbed()
-        .setColor('GREEN')
+        .setColor('RED')
         .setTitle('Product Revoked')
         .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
         .addField('Discord User', userInfo.discordID)
         .addField('Product', productname)
+        .setTimestamp()
         message.channel.send(embed)
+
+        //Log
+        //Ensure data
+        await client.guildSettings.ensure(message.guild.id, {
+          logchannel: ''
+        })
+
+        //Get Channel
+        let logchannel = await client.guildSettings.get(`${message.guild.id}.logchannel`)
+
+        if(logchannel){
+          //Send Log Message
+          try{
+            const logembed = new Discord.MessageEmbed()
+            .setColor(client.config.mainEmbedColor)
+            .setTitle('Product Revoked')
+            .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
+            .addField('Discord User', userInfo.discordID)
+            .addField('Product', productname)
+            .setTimestamp()
+            message.guild.channels.cache.get(logchannel).send(logembed)
+          }
+          catch(error){
+            message.channel.send('❌ I could not log the action')
+          }
+        }
       }else{
         return sendError('This user doesn\'t own this product.||giveproduct <id> <productname>')
       }

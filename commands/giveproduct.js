@@ -27,10 +27,37 @@ module.exports = {
         const embed = new Discord.MessageEmbed()
         .setColor('GREEN')
         .setTitle('Product Given')
-        .addField('User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
+        .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
         .addField('Discord User', userInfo.discordID)
         .addField('Product', productname)
+        .setTimestamp()
         message.channel.send(embed)
+
+        //Log
+        //Ensure data
+        await client.guildSettings.ensure(message.guild.id, {
+          logchannel: ''
+        })
+
+        //Get Channel
+        let logchannel = await client.guildSettings.get(`${message.guild.id}.logchannel`)
+
+        if(logchannel){
+          //Send Log Message
+          try{
+            const logembed = new Discord.MessageEmbed()
+            .setColor(client.config.mainEmbedColor)
+            .setTitle('Product Given')
+            .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
+            .addField('Discord User', userInfo.discordID)
+            .addField('Product', productname)
+            .setTimestamp()
+            message.guild.channels.cache.get(logchannel).send(logembed)
+          }
+          catch(error){
+            message.channel.send('❌ I could not log the action')
+          }
+        }
       }else{
         return sendError('This user already owns this product.||giveproduct <id> <productname>')
       }

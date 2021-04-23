@@ -4,11 +4,19 @@ module.exports = {
         const Discord = require("discord.js");
         const axios = require("axios");
 
+		//Ensure data
+		await client.guildSettings.ensure(message.guild.id, {
+			prefix: client.config.defaultPrefix
+		})
+	  
+		//Prefix fetching code
+		let prefix = await client.guildSettings.get(`${message.guild.id}.prefix`)
+
         if(!args[0]){
 			const failureembed = new Discord.MessageEmbed()
 			.setColor('RED')
 			.setTitle(`Link Account`)
-			.setDescription(`You need to provide a Roblox account name.\n\n**Example**: \`${client.config.prefix}link accountname\``)
+			.setDescription(`You need to provide a Roblox account name.\n\n**Example**: \`${prefix}link accountname\``)
 			return message.channel.send(failureembed)
 		}
 

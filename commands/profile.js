@@ -2,6 +2,15 @@ module.exports = {
   aliases: ['myproducts', 'my'],
     async run(client, message, args, sendError, getUserInfo, getRobloxInfo) {
     const Discord = require("discord.js");
+    
+    //Ensure data
+    await client.guildSettings.ensure(message.guild.id, {
+      prefix: client.config.defaultPrefix
+    })
+
+    //Prefix fetching code
+    let prefix = await client.guildSettings.get(`${message.guild.id}.prefix`)
+
     if(message.mentions.users.first()){
       var selecteduser = {
         "type": "ping",
@@ -28,7 +37,7 @@ module.exports = {
       //Message Author Unverified
       const unverified = new Discord.MessageEmbed()
       .setTitle('Unverified')
-      .setDescription(`There is no Roblox account linked to this Discord account.\nRun the \`${client.config.prefix}link\` command to link your Roblox account.`)
+      .setDescription(`There is no Roblox account linked to this Discord account.\nRun the \`${prefix}link\` command to link your Roblox account.`)
       if(!userInfo.verified) return message.channel.send(unverified)
     }
 
@@ -50,7 +59,7 @@ module.exports = {
     }
 
     const embed = new Discord.MessageEmbed()
-    .setColor('BLACK')
+    .setColor(client.config.mainEmbedColor)
     .setTitle(`${selecteduser.username}'s Profile`)
     .addField('Roblox Username', userInfo.robloxUsername, true)
     if(client.config.showProfileRobloxID) embed.addField('Roblox ID', userInfo.robloxID, true)

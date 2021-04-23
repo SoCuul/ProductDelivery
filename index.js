@@ -49,6 +49,10 @@ if(client.config.dbType.toLowerCase() === 'sqlite'){
 		name: 'robloxLink',
 		provider,
 	});
+	client.guildSettings = new Josh({
+		name: 'guildSettings',
+		provider,
+	});
 }else
 if(client.config.dbType.toLowerCase() === 'mongo'){
 	//MongoDB
@@ -84,6 +88,16 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
     		url: client.config.mongoURL
   		}
 	});
+	client.guildSettings = new Josh({
+		name: 'guildSettings',
+		provider: JoshMongo,
+
+  		providerOptions: {
+    		collection: client.config.mongoCollection,
+    		dbName: client.config.mongoClusterName,
+    		url: client.config.mongoURL
+  		}
+	});
 }else{
 	console.log('Configuration Error: "DBType" must be either sqlite or mongo')
 	process.exit(0)
@@ -102,8 +116,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 //Get User Information from Roblox ID
 client.getUserInfo = async function getUserInfo (inputRobloxID) {
 	let userInfo = await client.robloxLink.find(value => value.robloxID === inputRobloxID)
+	let discordID = ''
     if(userInfo){
-    	var discordID = Object.keys(userInfo)[0]
+    	discordID = Object.keys(userInfo)[0]
     }else{
     	return {
     		"verified": false
@@ -364,6 +379,7 @@ async function API_CreatePurchase (request, response) {
 	await client.usersdb.push(`${request.body.robloxid}.${request.body.guildid}`, request.body.productname)
 
 	//Notify user
+	let dmerror = false
 	try{
 		let user = await client.users.fetch(userInfo.discordID)
 		let guild = client.guilds.cache.get(request.body.guildid)
@@ -374,9 +390,35 @@ async function API_CreatePurchase (request, response) {
         .addField('Download Link:', product.file)
         .setFooter(guild.name, guild.iconURL())
 		await user.send(embed)
+
+		//Log
+    	//Ensure data
+    	await client.guildSettings.ensure(request.body.guildid, {
+			logchannel: ''
+		})
+  
+		//Get Channel
+		let logchannel = await client.guildSettings.get(`${request.body.guildid}.logchannel`)
+  
+		if(logchannel){
+			//Send Log Message
+			try{
+				const logembed = new Discord.MessageEmbed()
+				.setColor(client.config.mainEmbedColor)
+				.setTitle('Product Purchased')
+				.addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
+				.addField('Discord User', userInfo.discordID)
+				.addField('Product', product.name)
+				.setTimestamp()
+				guild.channels.cache.get(logchannel).send(logembed)
+			}
+			catch(error){
+				console.log(`I could not log the purchase of "${product.name}" in guild "${request.body.guildid}"`)
+			}
+		}
 	}
 	catch(error){
-		var dmerror = true
+		dmerror = true
 	}
 
 	//Send response

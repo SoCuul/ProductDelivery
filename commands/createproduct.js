@@ -115,7 +115,35 @@ module.exports = {
       .addField('Description', description)
       .addField('Developer Product ID', productid)
       .addField('File', file)
+      .setTimestamp()
       message.channel.send(embed)
+
+      //Log
+      //Ensure data
+      await client.guildSettings.ensure(message.guild.id, {
+        logchannel: ''
+      })
+
+      //Get Channel
+      let logchannel = await client.guildSettings.get(`${message.guild.id}.logchannel`)
+
+      if(logchannel){
+        //Send Log Message
+        try{
+          const logembed = new Discord.MessageEmbed()
+          .setColor(client.config.mainEmbedColor)
+          .setTitle('Product Created')
+          .addField('Name', name)
+          .addField('Description', description)
+          .addField('Developer Product ID', productid)
+          .addField('File', file)
+          .setTimestamp()
+          message.guild.channels.cache.get(logchannel).send(logembed)
+        }
+        catch(error){
+          message.channel.send('❌ I could not log the action')
+        }
+      }
     }
 
     async function main(){
