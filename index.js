@@ -154,6 +154,7 @@ client.getRobloxInfo = async function getRobloxInfo (discordID) {
     if(robloxID && robloxUsername){
       	return {
         	"verified": true,
+			"discordID": discordID,
         	"robloxID": await client.robloxLink.get(`${discordID}.robloxID`),
         	"robloxUsername": await client.robloxLink.get(`${discordID}.robloxUsername`)
       	}
@@ -329,7 +330,8 @@ async function API_CreatePurchase (request, response) {
 	}
 
 	//Validate token
-	if(request.body.token !== 'test'){
+	await client.guildSettings.ensure(`${request.body.guildid}.token`, '')
+	if(request.body.token !== await client.guildSettings.get(`${request.body.guildid}.token`)){
 		response.status(400)
 		return response.send({
 			"error": "token is invalid"
