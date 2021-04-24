@@ -207,9 +207,19 @@ async function API_GuildProducts (request, response) {
 	await client.products.ensure(request.body.guildid, {})
     let allproducts = await client.products.get(request.body.guildid)
 
+	//Create object
+	let products = {}
+	for (i in allproducts) {
+		products[i] = {
+			name: allproducts[i].name,
+			description: allproducts[i].description,
+			productid: allproducts[i].productid
+		}
+	}
+
 	//Send Response
 	response.status(200)
-	return response.send(allproducts)
+	return response.send(products)
 }
 
 async function API_UserProducts (request, response) {
