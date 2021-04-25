@@ -78,6 +78,8 @@ You can view the API endpoints by visiting `yourserver:3000`.
 * `giveproduct <robloxid/@user> <productname>` Gives a product to a user.
 * `revokeproduct <robloxid/@user> <productname>` Revokes a product from a user.
 * `config` Configures the bot for your server.
+### Owner Commands
+* `eval <code>` Evaluates JavaScript code.
 
 
 # Support
