@@ -10,41 +10,6 @@ client.config = config;
 //Load env
 require('dotenv').config()
 
-//Update Checker
-if(client.config.updateCheck === true){
-	const axios = require('axios');
-
-	(async () => {
-		try{
-			//Make GitHub API Request
-			let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest')
-
-			//Parse response
-			if(updaterequest.response){
-				console.log('[Update Checker] No releases could be found. Please try again later.')
-			}else{
-				//Compare versions
-				let currentversion = require('./package.json').version.replace(/./g, "")
-				let repoversion = updaterequest.data.tag_name.replace(/./g, "")
-
-				//Check for numbers
-				if(isNaN(currentversion) || isNaN(repoversion)){
-					console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
-				}else{
-					if(Number(repoversion) > Number(currentversion)){
-						console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
-					}else{
-						console.log('[Update Checker] You are up to date!')
-					}
-				}
-			}
-		}
-		catch(error){
-			console.log('[Update Checker] There was an error checking for updates')
-		}
-	})()
-}
-
 /* Load all events */
 fs.readdir('./events/', (_err, files) => {
 	files.forEach(file => {
@@ -149,6 +114,41 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 
     //Client Login
     await client.login(process.env.TOKEN);
+
+	//Update Checker
+	if(client.config.updateCheck === true){
+		const axios = require('axios');
+
+		(async () => {
+			try{
+				//Make GitHub API Request
+				let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest')
+
+				//Parse response
+				if(updaterequest.response){
+					console.log('[Update Checker] No releases could be found. Please try again later.')
+				}else{
+					//Compare versions
+					let currentversion = require('./package.json').version.replace(/\./g, "")
+					let repoversion = updaterequest.data.tag_name.replace(/./g, "")
+
+					//Check for numbers
+					if(isNaN(currentversion) || isNaN(repoversion)){
+						console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
+					}else{
+						if(Number(repoversion) > Number(currentversion)){
+							console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
+						}else{
+							console.log('[Update Checker] You are up to date!')
+						}
+					}
+				}
+			}
+			catch(error){
+				console.log('[Update Checker] There was an error checking for updates')
+			}
+		})()
+	}
 })();
 
 //Functions
