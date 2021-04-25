@@ -1,5 +1,4 @@
 {
-    "token": "",
     "defaultPrefix": "",
     "botName": "",
     "mainEmbedColor": "",
@@ -12,9 +11,5 @@
     "activityType": "",
     "activityStatus": "",
 
-    "dbType": "",
-
-    "mongoCollection": "",
-    "mongoClusterName": "",
-    "mongoURL": ""
+    "dbType": ""
 }
