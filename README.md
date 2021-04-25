@@ -62,6 +62,23 @@ You will need to ping the API every 5 minutes to keep the bot online. We reccome
 # API
 You can view the API endpoints by visiting `yourserver:3000`.
 
+# Commands
+### <> = Required
+### [] = Optional
+* `help` Shows the command list.
+* `profile [@user]` Shows the user's Roblox account and products.
+* `retrieve <productname>` Retrieve a product that you own.
+* `link <robloxname>` Links your Roblox account with the bot.
+* 
+* `productinfo <productname>` Shows information about the product.
+* `createproduct` Creates a product.
+* `deleteproduct <productname>` Deletes a product.
+* `modifyproduct <productname>` Modifies a product.
+* `giveproduct <robloxid/@user> <productname>` Gives a product to a user.
+* `revokeproduct <robloxid/@user> <productname>` Revokes a product from a user.
+* `config` Configures the bot for your server.
+
+
 # Support
 ### Join my Discord Server for help with the bot.
 
