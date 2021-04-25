@@ -1,19 +1,20 @@
 {
-  "token": "",
-  "defaultPrefix": "",
-  "botName": "",
-  "mainEmbedColor": "",
+    "token": "",
+    "defaultPrefix": "",
+    "botName": "",
+    "mainEmbedColor": "",
 
-  "showProfileRobloxID": true,
-  
-  "ownerID": "",
+    "showProfileRobloxID": true,
+    "showHelpImage": true,
 
-  "activityType": "",
-  "activityStatus": "",
+    "ownerID": "",
 
-  "dbType": "",
+    "activityType": "",
+    "activityStatus": "",
 
-  "mongoCollection": "",
-  "mongoClusterName": "",
-  "mongoURL": ""
+    "dbType": "",
+
+    "mongoCollection": "",
+    "mongoClusterName": "",
+    "mongoURL": ""
 }

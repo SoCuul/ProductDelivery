@@ -3,8 +3,12 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+//Load config
 const config = require('./config.json');
 client.config = config;
+
+//Load env
+require('dotenv').config()
 
 /* Load all events */
 fs.readdir('./events/', (_err, files) => {
@@ -63,9 +67,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: client.config.mongoCollection,
-    		dbName: client.config.mongoClusterName,
-    		url: client.config.mongoURL
+    		collection: process.env.MONGOCOLLECTION,
+    		dbName: process.env.MONGOCLUSTERNAME,
+    		url: process.env.MONGOURL
   		}
 	});
 	client.usersdb = new Josh({
@@ -73,9 +77,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: client.config.mongoCollection,
-    		dbName: client.config.mongoClusterName,
-    		url: client.config.mongoURL
+    		collection: process.env.MONGOCOLLECTION,
+    		dbName: process.env.MONGOCLUSTERNAME,
+    		url: process.env.MONGOURL
   		}
 	});
 	client.robloxLink = new Josh({
@@ -83,9 +87,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: client.config.mongoCollection,
-    		dbName: client.config.mongoClusterName,
-    		url: client.config.mongoURL
+    		collection: process.env.MONGOCOLLECTION,
+    		dbName: process.env.MONGOCLUSTERNAME,
+    		url: process.env.MONGOURL
   		}
 	});
 	client.guildSettings = new Josh({
@@ -93,9 +97,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: client.config.mongoCollection,
-    		dbName: client.config.mongoClusterName,
-    		url: client.config.mongoURL
+    		collection: process.env.MONGOCOLLECTION,
+    		dbName: process.env.MONGOCLUSTERNAME,
+    		url: process.env.MONGOURL
   		}
 	});
 }else{
@@ -109,7 +113,7 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
     console.log(`Connected to users database, there are ${await client.usersdb.size} active users.`);
 
     //Client Login
-    await client.login(client.config.token);
+    await client.login(process.env.TOKEN);
 })();
 
 //Functions
