@@ -3,6 +3,7 @@
     "botName": "",
     "mainEmbedColor": "",
 
+    "updateCheck": true,
     "showProfileRobloxID": true,
     "showHelpImage": true,
 

@@ -27,6 +27,7 @@ Here's how to configure it (Please replace the tutorial values with your own):
     "botName": "Please enter the name of the bot",
     "mainEmbedColor": "Please enter the HEX/HTML code that will be used for most embeds",
 
+    "updateCheck": true/false,
     "showProfileRobloxID": true/false,
     "showHelpImage": true/false,
 
