@@ -122,7 +122,9 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		(async () => {
 			try{
 				//Make GitHub API Request
-				let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest')
+				let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest', {
+					"headers": {'accept': 'application/vnd.github.v3+json'}
+				})
 
 				//Parse response
 				if(updaterequest.response){
@@ -130,7 +132,7 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 				}else{
 					//Compare versions
 					let currentversion = require('./package.json').version.replace(/\./g, "")
-					let repoversion = updaterequest.data.tag_name.replace(/./g, "")
+					let repoversion = updaterequest.data.tag_name.replace(/\./g, "")
 
 					//Check for numbers
 					if(isNaN(currentversion) || isNaN(repoversion)){
