@@ -64,6 +64,7 @@ You can view the API endpoints by visiting `yourserver:3000`.
 
 # Commands
 **<> = Required**
+
 **[] = Optional**
 ### Main Commands
 * `help` Shows the command list.
