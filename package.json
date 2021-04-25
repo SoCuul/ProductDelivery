@@ -1,5 +1,5 @@
 {
-  "name": "robloxproductdelivery",
+  "name": "productdelivery",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -19,5 +19,13 @@
     "express": "^4.17.1"
   },
   "devDependencies": {},
-  "description": ""
+  "description": "ProductDelivery is a Roblox Product Delivery bot. It allows products to be given to users and has a robust API for intergrating it into Roblox Hubs.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoCuul/ProductDelivery.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SoCuul/ProductDelivery/issues"
+  },
+  "homepage": "https://github.com/SoCuul/ProductDelivery#readme"
 }
