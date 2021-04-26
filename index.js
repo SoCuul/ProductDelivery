@@ -221,11 +221,15 @@ app.listen(port, () => {
 })
 
 //Recive Requests
-app.get('/', express.static('html'))
+app.get('/', API_Docs)
 app.get('/products/guild/', API_GuildProducts)
 app.get('/products/user/', API_UserProducts)
 app.get('/information/', API_DiscordInfo)
 app.post('/purchase/', API_CreatePurchase)
+
+async function API_Docs (request, response) {
+	response.redirect('https://productdelivery.socuul.dev/')
+}
 
 async function API_GuildProducts (request, response) {
 	//Check for missing data
