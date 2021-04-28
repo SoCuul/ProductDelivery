@@ -64,7 +64,7 @@ module.exports = {
 					}
 					let verificationcode = encodedid.join(' ') || 'Verification Code: ' + endodedid.join(' ')
 
-					if(response.data.description === verificationcode){
+					if(response.data.description.split('\n').includes(verificationcode)){
                         //Save to database
                         await client.robloxLink.set(message.author.id, {
                             "robloxID": `${response.data.id}`,

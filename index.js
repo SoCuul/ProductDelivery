@@ -112,44 +112,81 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
     console.log(`Connected to products database, there are ${await client.products.size} active servers.`);
     console.log(`Connected to users database, there are ${await client.usersdb.size} active users.`);
 
-    //Client Login
-    await client.login(process.env.TOKEN);
+	try{
+		//Client Login
+		await client.login(process.env.TOKEN)
 
-	//Update Checker
-	if(client.config.updateCheck === true){
-		const axios = require('axios');
+		//Update Checker
+		if(client.config.updateCheck === true){
+			const axios = require('axios');
 
-		(async () => {
-			try{
-				//Make GitHub API Request
-				let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest', {
-					"headers": {'accept': 'application/vnd.github.v3+json'}
-				})
+			(async () => {
+				try{
+					//Make GitHub API Request
+					let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest', {
+						"headers": {'accept': 'application/vnd.github.v3+json'}
+					})
 
-				//Parse response
-				if(updaterequest.response){
-					console.log('[Update Checker] No releases could be found. Please try again later.')
-				}else{
-					//Compare versions
-					let currentversion = require('./package.json').version.replace(/\./g, "")
-					let repoversion = updaterequest.data.tag_name.replace(/\./g, "")
-
-					//Check for numbers
-					if(isNaN(currentversion) || isNaN(repoversion)){
-						console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
+					//Parse response
+					if(updaterequest.response){
+						console.log('[Update Checker] No releases could be found. Please try again later.')
 					}else{
-						if(Number(repoversion) > Number(currentversion)){
-							console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
+						//Compare versions
+						let unparsedcurrentversion = require('./package.json').version
+						let currentversion = unparsedcurrentversion.replace(/\./g, "")
+						let unparsedrepoversion = updaterequest.data.tag_name
+						let repoversion = unparsedrepoversion.replace(/\./g, "")
+
+						//Check for numbers
+						if(isNaN(currentversion) || isNaN(repoversion)){
+							console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
 						}else{
-							console.log('[Update Checker] You are up to date!')
+							if(Number(repoversion) > Number(currentversion)){
+								console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
+								console.log(`[Update Checker] Current Version: ${unparsedcurrentversion}`)
+								console.log(`[Update Checker] New Version: ${unparsedrepoversion}`)
+
+								//Notify owner
+								if(client.config.ownerID && !isNaN(client.config.ownerID)){
+									//Reminder function
+									async function updateReminder () {
+										try{
+											//Fetch bot owner
+											let botOwner = await client.users.fetch(client.config.ownerID)
+											const reminderEmbed = new Discord.MessageEmbed()
+											.setColor(client.config.mainEmbedColor)
+											.setThumbnail(client.user.avatarURL())
+											.setTitle('Update Available')
+											.addField('Current Version',unparsedcurrentversion)
+											.addField('New Version', unparsedrepoversion)
+											.addField('Download', 'https://github.com/SoCuul/ProductDelivery/releases/latest')
+											//.setDescription(`Current Version: ${unparsedcurrentversion}\nNew Version: ${unparsedrepoversion}\n\nDownload: https://github.com/SoCuul/ProductDelivery/releases/latest`)
+											.setTimestamp()
+											botOwner.send(reminderEmbed)
+											//Remind in 24 hours
+											setTimeout(updateReminder, 86400000)
+										}
+										catch(error){
+											console.log('[Update Reminder] Could not notify bot owner')
+										}
+									}
+									updateReminder()
+								}
+							}else{
+								console.log('[Update Checker] You are up to date!')
+							}
 						}
 					}
 				}
-			}
-			catch(error){
-				console.log('[Update Checker] There was an error checking for updates')
-			}
-		})()
+				catch(error){
+					console.log('[Update Checker] There was an error checking for updates')
+				}
+			})()
+		}
+	}
+	catch(error){
+		console.log('[Error] Could not login. Please make sure the token is valid.')
+		process.exit(1)
 	}
 })();
 
