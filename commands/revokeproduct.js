@@ -6,8 +6,8 @@ module.exports = {
 
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('❌ You need the `Administrator` permission to run this command.')
 
-        if(!args[0] && !message.mentions.users.first()) return sendError('What\'s the Roblox ID/mention of the person to revoke the product from?||giveproduct <robloxid/mention> <productname>')
-        if(!productname) return sendError('What is the product\'s name? (Case-Sensitive)||giveproduct <robloxid/mention> <productname>')
+        if(!args[0] && !message.mentions.users.first()) return sendError('What\'s the Roblox ID/mention of the person to revoke the product from?||revokeproduct <robloxid/mention> <productname>')
+        if(!productname) return sendError('What is the product\'s name? (Case-Sensitive)||revokeproduct <robloxid/mention> <productname>')
 
         //Check Verification
         let userInfo = message.mentions.users.first() ?  await getRobloxInfo(message.mentions.users.first().id) : await getUserInfo(args[0])
@@ -58,10 +58,10 @@ module.exports = {
                     }
                 }
             }else{
-                return sendError('This user doesn\'t own this product.||giveproduct <robloxid/mention> <productname>')
+                return sendError('This user doesn\'t own this product.||revokeproduct <robloxid/mention> <productname>')
             }
         }else{
-            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||giveproduct <robloxid/mention> <productname>')
+            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||revokeproduct <robloxid/mention> <productname>')
         }
     }
 };

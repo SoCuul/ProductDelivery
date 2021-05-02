@@ -51,7 +51,14 @@ module.exports = {
 
                     let messagecollected = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 600000})
                     
-                    if(messagecollected.first().content.toLowerCase() === 'cancel'){
+                    if(!messagecollected.first().content){
+                        const notvalid = new Discord.MessageEmbed()
+                        .setColor('RED')
+                        .setTitle('Modification Error')
+                        .setDescription('The response must contain text.\nPlease run the command again to restart the prompt.')
+                        return message.channel.send(notvalid)
+                    }
+                    else if(messagecollected.first().content.toLowerCase() === 'cancel'){
                         const canceled = new Discord.MessageEmbed()
                         .setColor('RED')
                         .setTitle(client.config.botName + ' Configuration Canceled')
@@ -88,7 +95,14 @@ module.exports = {
 
                     let messagecollected = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 600000})
                     
-                    if(messagecollected.first().content.toLowerCase() === 'cancel'){
+                    if(!messagecollected.first().content){
+                        const notvalid = new Discord.MessageEmbed()
+                        .setColor('RED')
+                        .setTitle('Modification Error')
+                        .setDescription('The response must contain text.\nPlease run the command again to restart the prompt.')
+                        return message.channel.send(notvalid)
+                    }
+                    else if(messagecollected.first().content.toLowerCase() === 'cancel'){
                         const canceled = new Discord.MessageEmbed()
                         .setColor('RED')
                         .setTitle(client.config.botName + ' Configuration Canceled')
@@ -133,7 +147,14 @@ module.exports = {
 
                     let messagecollected = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 600000})
                     
-                    if(messagecollected.first().content.toLowerCase() === 'cancel'){
+                    if(!messagecollected.first().content){
+                        const notvalid = new Discord.MessageEmbed()
+                        .setColor('RED')
+                        .setTitle('Modification Error')
+                        .setDescription('The response must contain text.\nPlease run the command again to restart the prompt.')
+                        return message.channel.send(notvalid)
+                    }
+                    else if(messagecollected.first().content.toLowerCase() === 'cancel'){
                         const canceled = new Discord.MessageEmbed()
                         .setColor('RED')
                         .setTitle(client.config.botName + ' Configuration Canceled')

@@ -55,6 +55,13 @@ module.exports = {
                     .setDescription('Please run the command again to restart the prompt.')
                     return message.channel.send(canceled)
                 }
+                else if(!messagecollected.first().content){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
                 else if(messagecollected.first().content.length > 2000){
                     const toolong = new Discord.MessageEmbed()
                     .setColor('RED')
@@ -93,6 +100,13 @@ module.exports = {
                     .setDescription('Please run the command again to restart the prompt.')
                     return message.channel.send(canceled)
                 }
+                else if(!messagecollected.first().content){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
                 else if(messagecollected.first().content.length > 30){
                     const toolong = new Discord.MessageEmbed()
                     .setColor('RED')
@@ -130,6 +144,13 @@ module.exports = {
                     .setTitle('Modification Canceled')
                     .setDescription('Please run the command again to restart the prompt.')
                     return message.channel.send(canceled)
+                }
+                else if(!messagecollected.first().content){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
                 }else{
                     //Set data to db
                     await client.products.set(`${message.guild.id}.${productname}.file`, messagecollected.first().content)
