@@ -77,15 +77,14 @@ module.exports = {
 						.setTitle(`Link Account`)
 						.setDescription(`Your account has been linked.\nLinked Account: [**${response.data.name}**](https://www.roblox.com/users/${response.data.id}/profile)\nYou can now remove the verification text from your profile.`)
 						.setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${response.data.id}&width=420&height=420&format=png`)
-						verifymsg.edit(successembed)
+						return verifymsg.edit(successembed)
 					}else{
 						const failureembed = new Discord.MessageEmbed()
 						.setColor('RED')
 						.setTitle(`Link Account`)
 						.setDescription(`Please set your roblox about page to the following text.\nAfter you do this, run this command again.\n\`${verificationcode}\``)
 						.setImage('https://i.imgur.com/gBjhWkk.png')
-						verifymsg.edit(failureembed)
-						return message.channel.send(`**Verification Code:** ${verificationcode}`)
+						return verifymsg.edit(failureembed)
 					}
                 } catch (error) {
                     const failureembed = new Discord.MessageEmbed()

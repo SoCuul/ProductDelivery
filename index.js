@@ -67,8 +67,8 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: process.env.MONGOCOLLECTION,
-    		dbName: process.env.MONGOCLUSTERNAME,
+    		collection: 'products',
+			dbName: process.env.MONGODBNAME,
     		url: process.env.MONGOURL
   		}
 	});
@@ -77,8 +77,8 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: process.env.MONGOCOLLECTION,
-    		dbName: process.env.MONGOCLUSTERNAME,
+    		collection: 'users',
+			dbName: process.env.MONGODBNAME,
     		url: process.env.MONGOURL
   		}
 	});
@@ -87,8 +87,8 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: process.env.MONGOCOLLECTION,
-    		dbName: process.env.MONGOCLUSTERNAME,
+    		collection: 'robloxLink',
+			dbName: process.env.MONGODBNAME,
     		url: process.env.MONGOURL
   		}
 	});
@@ -97,8 +97,8 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 		provider: JoshMongo,
 
   		providerOptions: {
-    		collection: process.env.MONGOCOLLECTION,
-    		dbName: process.env.MONGOCLUSTERNAME,
+    		collection: 'guildSettings',
+			dbName: process.env.MONGODBNAME,
     		url: process.env.MONGOURL
   		}
 	});
@@ -111,6 +111,8 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 (async () => {
     console.log(`Connected to products database, there are ${await client.products.size} active servers.`);
     console.log(`Connected to users database, there are ${await client.usersdb.size} active users.`);
+	console.log(`Connected to roblox link database, there are ${await client.robloxLink.size} linked users.`);
+	console.log(`Connected to guild settings database, there are ${await client.products.size} configured servers.`);
 
 	try{
 		//Client Login
@@ -279,7 +281,7 @@ async function API_GuildProducts (request, response) {
 
 	//Validate guild
 	if(!client.guilds.cache.get(request.body.guildid)){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "guild does not exist"
 		})
@@ -322,14 +324,14 @@ async function API_UserProducts (request, response) {
 	//Validate user
 	let robloxInfo = await client.getUserInfo(request.body.robloxid)
 	if(robloxInfo.verified === false){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "user is not verified"
 		})
 	}
 	//Validate guild
 	if(!client.guilds.cache.get(request.body.guildid)){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "guild does not exist"
 		})
@@ -367,7 +369,7 @@ async function API_DiscordInfo (request, response) {
 	//Validate user
 	let userInfo = await client.getUserInfo(request.body.robloxid)
 	if(userInfo.verified === false){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "user is not verified"
 		})
@@ -387,7 +389,7 @@ async function API_DiscordInfo (request, response) {
 		})
 	}
 	catch(error){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "could not find fetch discord information"
 		})
@@ -421,27 +423,27 @@ async function API_CreatePurchase (request, response) {
 		})
 	}
 
-	//Validate token
-	await client.guildSettings.ensure(`${request.body.guildid}.token`, '')
-	if(request.headers.token !== await client.guildSettings.get(`${request.body.guildid}.token`)){
-		response.status(400)
-		return response.send({
-			"error": "token is invalid"
-		})
-	}
 	//Validate user
 	let userInfo = await client.getUserInfo(request.body.robloxid)
 	if(userInfo.verified === false){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "user is not verified"
 		})
 	}
 	//Validate guild
 	if(!client.guilds.cache.get(request.body.guildid)){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "guild does not exist"
+		})
+	}
+	//Validate token
+	await client.guildSettings.ensure(`${request.body.guildid}.token`, '')
+	if(request.headers.token !== await client.guildSettings.get(`${request.body.guildid}.token`)){
+		response.status(404)
+		return response.send({
+			"error": "token is invalid"
 		})
 	}
 	//Validate product name
@@ -450,7 +452,7 @@ async function API_CreatePurchase (request, response) {
 
 	let product = await client.products.get(`${request.body.guildid}.${request.body.productname}`)
 	if(!product){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "product does not exist"
 		})
@@ -463,7 +465,7 @@ async function API_CreatePurchase (request, response) {
 
 	//Check if user already owns product
 	if(usersproducts.includes(request.body.productname)){
-		response.status(400)
+		response.status(404)
 		return response.send({
 			"error": "user already owns product"
 		})
