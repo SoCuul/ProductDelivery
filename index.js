@@ -267,12 +267,12 @@ app.get('/information/', API_DiscordInfo)
 app.post('/purchase/', API_CreatePurchase)
 
 async function API_Docs (request, response) {
-	response.redirect('https://productdelivery.socuul.dev/')
+	response.redirect('https://productdelivery.socuul.dev/bot-info/api-endpoints/')
 }
 
 async function API_GuildProducts (request, response) {
 	//Check for missing data
-	if(!request.body.guildid){
+	if(!request.query.guildid){
 		response.status(400)
 		return response.send({
 			"error": "guildid is missing"
@@ -280,7 +280,7 @@ async function API_GuildProducts (request, response) {
 	}
 
 	//Validate guild
-	if(!client.guilds.cache.get(request.body.guildid)){
+	if(!client.guilds.cache.get(request.query.guildid)){
 		response.status(404)
 		return response.send({
 			"error": "guild does not exist"
@@ -288,8 +288,8 @@ async function API_GuildProducts (request, response) {
 	}
 
 	//Fetch products from DB
-	await client.products.ensure(request.body.guildid, {})
-    let allproducts = await client.products.get(request.body.guildid)
+	await client.products.ensure(request.query.guildid, {})
+    let allproducts = await client.products.get(request.query.guildid)
 
 	//Create object
 	let products = {}
@@ -308,13 +308,13 @@ async function API_GuildProducts (request, response) {
 
 async function API_UserProducts (request, response) {
 	//Check for missing data
-	if(!request.body.robloxid){
+	if(!request.query.robloxid){
 		response.status(400)
 		return response.send({
 			"error": "robloxid is missing"
 		})
 	}
-	else if(!request.body.guildid){
+	else if(!request.query.guildid){
 		response.status(400)
 		return response.send({
 			"error": "guildid is missing"
@@ -322,7 +322,7 @@ async function API_UserProducts (request, response) {
 	}
 
 	//Validate user
-	let robloxInfo = await client.getUserInfo(request.body.robloxid)
+	let robloxInfo = await client.getUserInfo(request.query.robloxid)
 	if(robloxInfo.verified === false){
 		response.status(404)
 		return response.send({
@@ -330,7 +330,7 @@ async function API_UserProducts (request, response) {
 		})
 	}
 	//Validate guild
-	if(!client.guilds.cache.get(request.body.guildid)){
+	if(!client.guilds.cache.get(request.query.guildid)){
 		response.status(404)
 		return response.send({
 			"error": "guild does not exist"
@@ -338,11 +338,11 @@ async function API_UserProducts (request, response) {
 	}
 
 	//Fetch all products from DB
-	await client.products.ensure(request.body.guildid, {})
-	let allproducts = await client.products.get(request.body.guildid)
+	await client.products.ensure(request.query.guildid, {})
+	let allproducts = await client.products.get(request.query.guildid)
 	//Fetch user products from DB
-	await client.usersdb.ensure(`${request.body.robloxid}.${request.body.guildid}`, [])
-	let myproducts = await client.usersdb.get(`${request.body.robloxid}.${request.body.guildid}`)
+	await client.usersdb.ensure(`${request.query.robloxid}.${request.query.guildid}`, [])
+	let myproducts = await client.usersdb.get(`${request.query.robloxid}.${request.query.guildid}`)
 
 	//Get valid products
 	let productnames = []
@@ -359,7 +359,7 @@ async function API_UserProducts (request, response) {
 
 async function API_DiscordInfo (request, response) {
 	//Check for missing data
-	if(!request.body.robloxid){
+	if(!request.query.robloxid){
 		response.status(400)
 		return response.send({
 			"error": "robloxid is missing"
@@ -367,7 +367,7 @@ async function API_DiscordInfo (request, response) {
 	}
 
 	//Validate user
-	let userInfo = await client.getUserInfo(request.body.robloxid)
+	let userInfo = await client.getUserInfo(request.query.robloxid)
 	if(userInfo.verified === false){
 		response.status(404)
 		return response.send({
