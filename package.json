@@ -1,6 +1,6 @@
 {
   "name": "productdelivery",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "index.js",
   "scripts": {
     "start": "node .",
@@ -10,7 +10,7 @@
   "author": "SoCuul",
   "license": "ISC",
   "dependencies": {
-    "@joshdb/core": "^1.2.3",
+    "@joshdb/core": "^1.2.4",
     "@joshdb/mongo": "^1.1.4",
     "@joshdb/sqlite": "^1.1.8",
     "axios": "^0.21.1",
