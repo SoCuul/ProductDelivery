@@ -18,13 +18,15 @@ module.exports = {
         const embed1 = new Discord.MessageEmbed()
         .setColor(client.config.mainEmbedColor)
         .setTitle('Modify Product')
-        .setDescription('Please select an option:\n\n1️⃣ Description\n2️⃣ Developer Product ID\n3️⃣ File')
+        .setDescription('Please select an option:\n\n1️⃣ Description\n2️⃣ Developer Product ID\n3️⃣ File\n4️⃣ Toggle Stock\n5️⃣ Modify Stock')
         const msg1 = await message.channel.send(embed1)
 
         try{
             await msg1.react('1️⃣')
             await msg1.react('2️⃣')
             await msg1.react('3️⃣')
+            await msg1.react('4️⃣')
+            await msg1.react('5️⃣')
         }
         catch(error){
             message.channel.send('❌ There was an error reacting to the message')
@@ -32,7 +34,7 @@ module.exports = {
 
         try{
             const filter = (reaction, user) => {
-                return ['1️⃣', '2️⃣', '3️⃣'].includes(reaction.emoji.name) && user.id === message.author.id;
+                return ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'].includes(reaction.emoji.name) && user.id === message.author.id;
             }
             let reactioncollected = await msg1.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })
 
@@ -78,10 +80,11 @@ module.exports = {
                     .setTitle('Modification Success')
                     .addField('Old Description', currentproducts[productname].description)
                     .addField('New Description', messagecollected.first().content)
+                    .setTimestamp()
                     return message.channel.send(success)
                 }
             }
-            if(reactioncollected.first().emoji.name === '2️⃣'){
+            else if(reactioncollected.first().emoji.name === '2️⃣'){
                 //Collect message
                 const embed2 = new Discord.MessageEmbed()
                 .setColor(client.config.mainEmbedColor)
@@ -123,10 +126,11 @@ module.exports = {
                     .setTitle('Modification Success')
                     .addField('Old Developer Product ID', currentproducts[productname].productid)
                     .addField('New Developer Product ID', messagecollected.first().content)
+                    .setTimestamp()
                     return message.channel.send(success)
                 }
             }
-            if(reactioncollected.first().emoji.name === '3️⃣'){
+            else if(reactioncollected.first().emoji.name === '3️⃣'){
                 //Collect message
                 const embed2 = new Discord.MessageEmbed()
                 .setColor(client.config.mainEmbedColor)
@@ -161,6 +165,90 @@ module.exports = {
                     .setTitle('Modification Success')
                     .addField('Old File', currentproducts[productname].file)
                     .addField('New File', messagecollected.first().content)
+                    .setTimestamp()
+                    return message.channel.send(success)
+                }
+            }
+            else if(reactioncollected.first().emoji.name === '4️⃣'){
+                //Check data from DB
+                let enabled = currentproducts[productname].stock ? true : false
+
+                if(enabled){
+                    //Toggle data
+                    await client.products.set(`${message.guild.id}.${productname}.stock`, false)
+
+                    //Notify user
+                    const success = new Discord.MessageEmbed()
+                    .setColor('GREEN')
+                    .setTitle('Modification Success')
+                    .setDescription('Product stock has been toggled **off**.')
+                    .setTimestamp()
+                    return message.channel.send(success)
+                }
+                else{
+                    //Toggle data
+                    await client.products.set(`${message.guild.id}.${productname}.stock`, true)
+
+                    //Notify user
+                    const success = new Discord.MessageEmbed()
+                    .setColor('GREEN')
+                    .setTitle('Modification Success')
+                    .setDescription('Product stock has been toggled **on**.')
+                    .setTimestamp()
+                    return message.channel.send(success)
+                }
+            }
+            else if(reactioncollected.first().emoji.name === '5️⃣'){
+                //Collect message
+                const embed2 = new Discord.MessageEmbed()
+                .setColor(client.config.mainEmbedColor)
+                .setTitle('Modify Stock')
+                .setDescription(`Please enter a new stock amount.`)
+                .setFooter(`Respond with "cancel" to cancel the prompt.`, '')
+                await msg1.reactions.removeAll().catch(error => message.channel.send('Could not clear reactions. Continue with the prompt.'));
+                await msg1.edit(embed2)
+
+                let messagecollected = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 600000})
+
+                if(messagecollected.first().content.toLowerCase() === 'cancel'){
+                    const canceled = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Canceled')
+                    .setDescription('Please run the command again to restart the prompt.')
+                    return message.channel.send(canceled)
+                }
+                else if(!messagecollected.first().content || isNaN(messagecollected.first().content)){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The response must be a number.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
+                else if(Number(messagecollected.first().content) > 1000){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The response must be a number under 1000.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
+                else if(Number(messagecollected.first().content) < 0){
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('The response must be a positive number.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
+                else{
+                    //Set data to db
+                    await client.products.set(`${message.guild.id}.${productname}.stockamount`, Number(messagecollected.first().content))
+
+                    //Notify user
+                    const success = new Discord.MessageEmbed()
+                    .setColor('GREEN')
+                    .setTitle('Modification Success')
+                    .addField('Old Amount', currentproducts[productname].stockamount)
+                    .addField('New Amount', messagecollected.first().content)
+                    .setTimestamp()
                     return message.channel.send(success)
                 }
             }

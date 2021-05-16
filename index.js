@@ -249,6 +249,7 @@ client.getRobloxInfo = async function getRobloxInfo (discordID) {
 const express = require('express')
 const bodyParser = require('body-parser');
 const { response } = require('express');
+const e = require('express');
 
 const app = express()
 app.use(bodyParser.json())
@@ -263,7 +264,8 @@ app.listen(port, () => {
 app.get('/', API_Docs)
 app.get('/products/guild/', API_GuildProducts)
 app.get('/products/user/', API_UserProducts)
-app.get('/information/', API_DiscordInfo)
+app.get('/information/user/', API_UserDiscordInfo)
+app.get('/information/guild/', API_GuildDiscordInfo)
 app.post('/purchase/', API_CreatePurchase)
 
 async function API_Docs (request, response) {
@@ -297,7 +299,12 @@ async function API_GuildProducts (request, response) {
 		products[i] = {
 			name: allproducts[i].name,
 			description: allproducts[i].description,
-			productid: allproducts[i].productid
+			productid: allproducts[i].productid,
+			stock: allproducts[i].stock
+		}
+		//Add stock amount
+		if(allproducts[i].stock){
+			products[i].stockamount = allproducts[i].stockamount
 		}
 	}
 
@@ -357,7 +364,7 @@ async function API_UserProducts (request, response) {
 	return response.send(productnames)
 }
 
-async function API_DiscordInfo (request, response) {
+async function API_UserDiscordInfo (request, response) {
 	//Check for missing data
 	if(!request.query.robloxid){
 		response.status(400)
@@ -391,7 +398,44 @@ async function API_DiscordInfo (request, response) {
 	catch(error){
 		response.status(404)
 		return response.send({
-			"error": "could not find fetch discord information"
+			"error": "could not find fetch user discord information"
+		})
+	}
+}
+
+async function API_GuildDiscordInfo (request, response) {
+	//Check for missing data
+	if(!request.query.guildid){
+		response.status(400)
+		return response.send({
+			"error": "guildid is missing"
+		})
+	}
+
+	//Validate guild
+	let guild = client.guilds.cache.get(request.query.guildid)
+	if(!guild){
+		response.status(404)
+		return response.send({
+			"error": "guild does not exist"
+		})
+	}
+
+	//Fetch guild information
+	try{
+		response.status(200)
+		return response.send({
+			"id": guild.id,
+			"name": guild.name,
+			"memberCount": guild.memberCount,
+			"ownerID": guild.ownerID,
+			"icon": guild.iconURL()
+		})
+	}
+	catch(error){
+		response.status(404)
+		return response.send({
+			"error": "could not find fetch guild discord information"
 		})
 	}
 }
@@ -446,7 +490,7 @@ async function API_CreatePurchase (request, response) {
 			"error": "token is invalid"
 		})
 	}
-	//Validate product name
+	//Validate product
 	//Fetch products from DB
 	await client.products.ensure(request.body.guildid, {})
 
@@ -469,6 +513,18 @@ async function API_CreatePurchase (request, response) {
 		return response.send({
 			"error": "user already owns product"
 		})
+	}
+
+	//Check for stock
+	if(product.stock && !isNaN(product.stockamount)){
+		if(product.stockamount < 1){
+			response.status(404)
+			return response.send({
+				"error": "no product stock is left"
+			})
+		}else{
+			await client.products.dec(`${request.body.guildid}.${request.body.productname}.stockamount`)
+		}
 	}
 
 	//Add product to user's db

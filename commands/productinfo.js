@@ -20,7 +20,11 @@ module.exports = {
             .addField('Description', product.description)
             .addField('Developer Product ID', product.productid)
             .addField('File', product.file)
+            .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
+            if(product.stock){
+                embed.addField('Stock Amount', product.stockamount, true)
+            }
             message.channel.send(embed)
         }else{
             return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||giveproduct <productname>')

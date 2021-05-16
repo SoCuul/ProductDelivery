@@ -2,10 +2,12 @@ module.exports = {
     aliases: [],
 	async run(client, message, args, sendError) {
         const Discord = require("discord.js");
-        let name = ''
-        let description = ''
-        let productid = ''
-        let file = ''
+        let name
+        let description
+        let productid
+        let file
+        let stock
+        let stockamount = 0
 
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('❌ You need the `Administrator` permission to run this command.')
 
@@ -88,6 +90,54 @@ module.exports = {
                 file = prompt4.first().content
             }
 
+            //Prompt 5
+            await message.channel.send('> **Part 5**\n> Should the product have limited stock?\n> Respond with `yes` or `no`.\n> Enter `cancel` to cancel.')
+            let prompt5 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
+            if(!prompt5.first().content){
+                message.channel.send('Sorry, but your response must contain text. Please restart the command.')
+                return
+            }
+            else if (prompt5.first().content.toLowerCase() == 'cancel') {
+                return message.channel.send('**Product Creation Canceled**')
+            }
+            else{
+                //Parse option
+                if(prompt5.first().content.toLowerCase() === 'yes'){
+                    stock = true
+                }
+                else if(prompt5.first().content.toLowerCase() === 'no'){
+                    stock = false
+                }
+                else{
+                    message.channel.send('Sorry, but your response is invalid. Please restart the command.')
+                    return 
+                }
+            }
+
+            //Prompt 6
+            if(stock){
+                await message.channel.send('> **Part 6**\n> How much stock should the product have?\n> Enter `cancel` to cancel.')
+                let prompt6 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
+                if(!prompt6.first().content || isNaN(prompt6.first().content)){
+                    message.channel.send('Sorry, but your response must be a number. Please restart the command.')
+                    return
+                }
+                else if(Number(prompt6.first().content) > 1000){
+                    message.channel.send('Sorry, but your response must be a number less than 1000. Please restart the command.')
+                    return
+                }
+                else if(Number(prompt6.first().content) < 1){
+                    message.channel.send('Sorry, but your response must be a number larger than 0. Please restart the command.')
+                    return
+                }
+                else if (prompt6.first().content.toLowerCase() == 'cancel') {
+                    return message.channel.send('**Product Creation Canceled**')
+                }
+                else{
+                    stockamount = Number(prompt6.first().content)
+                }
+            }
+
             //Create Product
             await client.products.ensure(message.guild.id, {})
 
@@ -95,7 +145,9 @@ module.exports = {
                 name: name,
                 description: description,
                 productid: productid,
-                file: file
+                file: file,
+                stock: stock,
+                stockamount: stockamount
             })
 
             const embed = new Discord.MessageEmbed()
@@ -105,7 +157,11 @@ module.exports = {
             .addField('Description', description)
             .addField('Developer Product ID', productid)
             .addField('File', file)
+            .addField('Stock Status', stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
+            if(stock){
+                embed.addField('Stock Amount', stockamount, true)
+            }
             message.channel.send(embed)
 
             //Log
@@ -127,7 +183,11 @@ module.exports = {
                     .addField('Description', description)
                     .addField('Developer Product ID', productid)
                     .addField('File', file)
+                    .addField('Stock Status', stock ? 'Enabled' : 'Disabled', true)
                     .setTimestamp()
+                    if(stock){
+                        logembed.addField('Stock Amount', stockamount, true)
+                    }
                     message.guild.channels.cache.get(logchannel).send(logembed)
                 }
                 catch(error){

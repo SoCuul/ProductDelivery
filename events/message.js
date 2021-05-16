@@ -1,4 +1,7 @@
 module.exports = async (client, message) => {
+    //MessageEmbeds
+    const { MessageEmbed } = require("discord.js");
+
     //Ignore commands in dm channels
     if (message.channel.type === 'dm' ) return;
 
@@ -13,7 +16,6 @@ module.exports = async (client, message) => {
     //Error Messages
     function sendError(input) {
         const errortick = '`'
-        const { MessageEmbed } = require("discord.js");
         let parts = input.split('||', 2);
         const error = new MessageEmbed()
         .setColor('RED')
@@ -46,5 +48,25 @@ module.exports = async (client, message) => {
     if (!cmd) return;
 
     // Run the command
-    cmd.run(client, message, args, sendError, getUserInfo, getRobloxInfo);
+    try{
+        await cmd.run(client, message, args, sendError, getUserInfo, getRobloxInfo);
+    }
+    catch(error){
+        //Truncate string
+        function truncateString(str, num) {
+            if (str.length <= num) {
+                return str
+            }
+            return str.slice(0, num) + '...'
+        }
+
+        //Send embed
+        const embed = new MessageEmbed()
+        .setColor('RED')
+        .setTitle('Execution Error')
+        .setDescription('There was an error running the command.')
+        .addField('Error', truncateString(error.toString(), 1021))
+        .setTimestamp()
+        message.channel.send(embed)
+    }
 };

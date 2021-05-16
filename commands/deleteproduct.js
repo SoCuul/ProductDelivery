@@ -8,17 +8,23 @@ module.exports = {
         
         if(!productname) return sendError('What product should I delete? (Case-Sensitive)||deleteproduct <productname>')
 
+        //Get product from DB
         await client.products.ensure(message.guild.id, {})
+        let product = await client.products.get(`${message.guild.id}.${productname}`)
 
-        if(await client.products.get(`${message.guild.id}.${productname}`)){
+        if(product){
             const embed = new Discord.MessageEmbed()
             .setColor('RED')
             .setTitle('Product Deleted')
-            .addField('Name', await client.products.get(`${message.guild.id}.${productname}.name`))
-            .addField('Description', await client.products.get(`${message.guild.id}.${productname}.description`))
-            .addField('Developer Product ID', await client.products.get(`${message.guild.id}.${productname}.productid`))
-            .addField('File', await client.products.get(`${message.guild.id}.${productname}.file`))
+            .addField('Name', product.name)
+            .addField('Description', product.description)
+            .addField('Developer Product ID', product.productid)
+            .addField('File', product.file)
+            .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
+            if(product.stock){
+                embed.addField('Stock Amount', product.stockamount, true)
+            }
             await message.channel.send(embed)
 
             //Log
@@ -36,11 +42,15 @@ module.exports = {
                     const logembed = new Discord.MessageEmbed()
                     .setColor(client.config.mainEmbedColor)
                     .setTitle('Product Deleted')
-                    .addField('Name', await client.products.get(`${message.guild.id}.${productname}.name`))
-                    .addField('Description', await client.products.get(`${message.guild.id}.${productname}.description`))
-                    .addField('Developer Product ID', await client.products.get(`${message.guild.id}.${productname}.productid`))
-                    .addField('File', await client.products.get(`${message.guild.id}.${productname}.file`))
+                    .addField('Name', product.name)
+                    .addField('Description', product.description)
+                    .addField('Developer Product ID', product.productid)
+                    .addField('File', product.file)
+                    .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
                     .setTimestamp()
+                    if(product.stock){
+                        embed.addField('Stock Amount', product.stockamount, true)
+                    }
                     message.guild.channels.cache.get(logchannel).send(logembed)
                 }
                 catch(error){
