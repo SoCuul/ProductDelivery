@@ -84,6 +84,10 @@ module.exports = {
                 message.channel.send('Sorry, but your response must contain text. Please restart the command.')
                 return
             }
+            else if(prompt4.first().content.length > 1024) {
+                message.channel.send('Sorry, but your response must be under 1024 characters. Please restart the command.')
+                return
+            }
             else if (prompt4.first().content.toLowerCase() == 'cancel') {
                 return message.channel.send('**Product Creation Canceled**')
             }

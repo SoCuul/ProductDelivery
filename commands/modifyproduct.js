@@ -135,7 +135,7 @@ module.exports = {
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must contain text.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else if(messagecollected.first().content.length > 30){
@@ -208,7 +208,14 @@ module.exports = {
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must contain text.\nPlease run the command again to restart the prompt.')
+                    return message.channel.send(notvalid)
+                }
+                else if(messagecollected.first().content.length > 1024) {
+                    const notvalid = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Modification Error')
+                    .setDescription('Your response must contain less than 1024 characters.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else{
@@ -274,7 +281,7 @@ module.exports = {
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The description must contain text.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must contain text.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else if(messagecollected.first().content.length > 30){
@@ -465,21 +472,21 @@ module.exports = {
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The response must be a number.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must be a number.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else if(Number(messagecollected.first().content) > 1000){
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The response must be a number under 1000.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must be a number under 1000.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else if(Number(messagecollected.first().content) < 0){
                     const notvalid = new Discord.MessageEmbed()
                     .setColor('RED')
                     .setTitle('Modification Error')
-                    .setDescription('The response must be a positive number.\nPlease run the command again to restart the prompt.')
+                    .setDescription('Your response must be a positive number.\nPlease run the command again to restart the prompt.')
                     return message.channel.send(notvalid)
                 }
                 else{
