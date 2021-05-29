@@ -19,7 +19,8 @@ module.exports = {
             .addField('Name', product.name)
             .addField('Description', product.description)
             .addField('Developer Product ID', product.productid)
-            .addField('File', product.file)
+            .addField('File', product.file,)
+            .addField('Image', product.image || 'None',)
             .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
             if(product.stock){

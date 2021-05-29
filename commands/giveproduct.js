@@ -29,6 +29,7 @@ module.exports = {
                 .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
                 .addField('Discord User', userInfo.discordID)
                 .addField('Product', productname)
+                .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${userInfo.robloxID}&width=420&height=420&format=png`)
                 .setTimestamp()
                 message.channel.send(embed)
 
@@ -45,11 +46,12 @@ module.exports = {
                     //Send Log Message
                     try{
                         const logembed = new Discord.MessageEmbed()
-                        .setColor(client.config.mainEmbedColor)
+                        .setColor('GREEN')
                         .setTitle('Product Given')
                         .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
                         .addField('Discord User', userInfo.discordID)
                         .addField('Product', productname)
+                        .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${userInfo.robloxID}&width=420&height=420&format=png`)
                         .setTimestamp()
                         message.guild.channels.cache.get(logchannel).send(logembed)
                     }

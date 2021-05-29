@@ -13,20 +13,6 @@ module.exports = async (client, message) => {
     //Prefix fetching code
     let prefix = await client.guildSettings.get(`${message.guild.id}.prefix`)
 
-    //Error Messages
-    function sendError(input) {
-        const errortick = '`'
-        let parts = input.split('||', 2);
-        const error = new MessageEmbed()
-        .setColor('RED')
-        .setTitle('Error')
-        .setDescription(parts[0])
-        .addField('Usage', `${errortick}${prefix}${parts[1]}${errortick}`)
-        .setFooter(client.config.botName, client.user.avatarURL({ dynamic: true }));
-        message.react('❌').catch(error => { console.log(`There was an error reacting to the message.`) })
-        message.channel.send(error)
-    }
-
     let getUserInfo = client.getUserInfo
     let getRobloxInfo = client.getRobloxInfo
 
@@ -46,6 +32,29 @@ module.exports = async (client, message) => {
 
     // If that command doesn't exist, silently exit and do nothing
     if (!cmd) return;
+
+    //Check for permissions
+   if(!message.guild.me.permissionsIn(message.channel).has('SEND_MESSAGES')) return
+   if(!message.guild.me.permissionsIn(message.channel).has('EMBED_LINKS')) return message.channel.send('I don\'t have the `Embed Links` permission. Please ask a server admin to fix my permissions.')
+   if(!message.guild.me.permissionsIn(message.channel).has('ADD_REACTIONS')) return message.channel.send('I don\'t have the `Add Reactions` permission. Please ask a server admin to fix my permissions.')
+
+    //Error Messages
+    function sendError(input) {
+        try{
+            let parts = input.split('||', 2);
+            const error = new MessageEmbed()
+            .setColor('RED')
+            .setTitle('Error')
+            .setDescription(parts[0])
+            .addField('Usage', `\`${prefix}${parts[1]}\``)
+            .setFooter(client.config.botName, client.user.avatarURL({ dynamic: true }));
+            message.react('❌').catch(error => { console.log(`There was an error reacting to the message.`) })
+            message.channel.send(error)
+        }
+        catch(error){
+            console.log('Could not send a sendError message')
+        }
+    }
 
     // Run the command
     try{

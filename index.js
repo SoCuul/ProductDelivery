@@ -123,63 +123,61 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 			async function updateChecker () {
 				const axios = require('axios');
 
-				(async () => {
-					try{
-						//Make GitHub API Request
-						let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest', {
-							"headers": {'accept': 'application/vnd.github.v3+json'}
-						})
+				try{
+					//Make GitHub API Request
+					let updaterequest = await axios.get('https://api.github.com/repos/SoCuul/ProductDelivery/releases/latest', {
+						"headers": {'accept': 'application/vnd.github.v3+json'}
+					})
 
-						//Parse response
-						if(updaterequest.response){
-							console.log('[Update Checker] No releases could be found. Please try again later.')
+					//Parse response
+					if(updaterequest.response){
+						console.log('[Update Checker] No releases could be found. Please try again later.')
+					}else{
+						//Compare versions
+						//Current Version
+						let unparsedcurrentversion = require('./package.json').version
+						let currentversion = unparsedcurrentversion.replace(/\./g, "")
+						//Repo Version
+						let unparsedrepoversion = updaterequest.data.tag_name
+						let repoversion = unparsedrepoversion.replace(/\./g, "")
+
+						//Check for numbers
+						if(isNaN(currentversion) || isNaN(repoversion)){
+							console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
 						}else{
-							//Compare versions
-							//Current Version
-							let unparsedcurrentversion = require('./package.json').version
-							let currentversion = unparsedcurrentversion.replace(/\./g, "")
-							//Repo Version
-							let unparsedrepoversion = updaterequest.data.tag_name
-							let repoversion = unparsedrepoversion.replace(/\./g, "")
+							if(Number(repoversion) > Number(currentversion)){
+								console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
+								console.log(`[Update Checker] Current Version: ${unparsedcurrentversion}`)
+								console.log(`[Update Checker] New Version: ${unparsedrepoversion}`)
 
-							//Check for numbers
-							if(isNaN(currentversion) || isNaN(repoversion)){
-								console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
-							}else{
-								if(Number(repoversion) > Number(currentversion)){
-									console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
-									console.log(`[Update Checker] Current Version: ${unparsedcurrentversion}`)
-									console.log(`[Update Checker] New Version: ${unparsedrepoversion}`)
-
-									//Notify owner
-									if(client.config.ownerID && !isNaN(client.config.ownerID)){
-										try{
-											//Fetch bot owner
-											let botOwner = await client.users.fetch(client.config.ownerID)
-											const reminderEmbed = new Discord.MessageEmbed()
-											.setColor(client.config.mainEmbedColor)
-											.setThumbnail(client.user.avatarURL())
-											.setTitle('Update Available')
-											.addField('Current Version', unparsedcurrentversion)
-											.addField('New Version', unparsedrepoversion)
-											.addField('Download', 'https://github.com/SoCuul/ProductDelivery/releases/latest')
-											.setTimestamp()
-											botOwner.send(reminderEmbed)
-										}
-										catch(error){
-											console.log('[Update Reminder] Could not notify bot owner')
-										}
+								//Notify owner
+								if(client.config.ownerID && !isNaN(client.config.ownerID)){
+									try{
+										//Fetch bot owner
+										let botOwner = await client.users.fetch(client.config.ownerID)
+										const reminderEmbed = new Discord.MessageEmbed()
+										.setColor(client.config.mainEmbedColor)
+										.setThumbnail(client.user.avatarURL())
+										.setTitle('Update Available')
+										.addField('Current Version', unparsedcurrentversion)
+										.addField('New Version', unparsedrepoversion)
+										.addField('Download', 'https://github.com/SoCuul/ProductDelivery/releases/latest')
+										.setTimestamp()
+										botOwner.send(reminderEmbed)
 									}
-								}else{
-									console.log('[Update Checker] You are up to date!')
+									catch(error){
+										console.log('[Update Reminder] Could not notify bot owner')
+									}
 								}
+							}else{
+								console.log('[Update Checker] You are up to date!')
 							}
 						}
 					}
-					catch(error){
-						console.log('[Update Checker] There was an error checking for updates')
-					}
-				})()
+				}
+				catch(error){
+					console.log('[Update Checker] There was an error checking for updates')
+				}
 				//Try again in 24 hours
 				setTimeout(updateChecker, 86400000)
 			}
@@ -261,6 +259,7 @@ app.listen(port, () => {
 
 //Recive Requests
 app.get('/', API_Docs)
+app.get('/whitelist/', API_ProductWhitelist)
 app.get('/products/guild/', API_GuildProducts)
 app.get('/products/user/', API_UserProducts)
 app.get('/information/user/', API_UserDiscordInfo)
@@ -271,8 +270,76 @@ async function API_Docs (request, response) {
 	response.redirect('https://productdelivery.socuul.dev/bot-info/api-endpoints/')
 }
 
+async function API_ProductWhitelist (request, response) {
+	if(!request.query.robloxid){
+		response.status(400)
+		return response.send({
+			"error": "productname is missing"
+		})
+	}
+	else if(!request.query.guildid){
+		response.status(400)
+		return response.send({
+			"error": "guildid is missing"
+		})
+	}
+	else if(!request.query.productname){
+		response.status(400)
+		return response.send({
+			"error": "productname is missing"
+		})
+	}
+
+	//Validate user
+	let robloxInfo = await client.getUserInfo(request.query.robloxid)
+	if(robloxInfo.verified === false){
+		response.status(404)
+		return response.send({
+			"error": "user is not verified"
+		})
+	}
+	//Validate guild
+	if(!client.guilds.cache.get(request.query.guildid)){
+		response.status(404)
+		return response.send({
+			"error": "guild does not exist"
+		})
+	}
+
+	//Fetch all products from DB
+	await client.products.ensure(request.query.guildid, {})
+	let allproducts = await client.products.get(request.query.guildid)
+	//Fetch user products from DB
+	await client.usersdb.ensure(`${request.query.robloxid}.${request.query.guildid}`, [])
+	let myproducts = await client.usersdb.get(`${request.query.robloxid}.${request.query.guildid}`)
+
+	//Get valid products
+	let productnames = []
+	for(product in myproducts){
+		if(allproducts[myproducts[product]]){
+			productnames.push(myproducts[product])
+		}
+	}
+
+	//Check if user owns product
+	if(productnames.includes(request.query.productname)){
+		response.status(200)
+		return response.send(true)
+	}
+	else{
+		response.status(200)
+		return response.send(false)
+	}
+}
+
 async function API_GuildProducts (request, response) {
 	//Check for missing data
+	if(!request.headers.token){
+		response.status(400)
+		return response.send({
+			"error": "token is missing"
+		})
+	}
 	if(!request.query.guildid){
 		response.status(400)
 		return response.send({
@@ -280,6 +347,14 @@ async function API_GuildProducts (request, response) {
 		})
 	}
 
+	//Validate token
+	await client.guildSettings.ensure(`${request.query.guildid}.token`, '')
+	if(request.headers.token !== await client.guildSettings.get(`${request.query.guildid}.token`)){
+		response.status(404)
+		return response.send({
+			"error": "token is invalid"
+		})
+	}
 	//Validate guild
 	if(!client.guilds.cache.get(request.query.guildid)){
 		response.status(404)
@@ -305,6 +380,10 @@ async function API_GuildProducts (request, response) {
 		if(allproducts[i].stock){
 			products[i].stockamount = allproducts[i].stockamount
 		}
+		//Add image
+		if(allproducts[i].image){
+			products[i].image = allproducts[i].image
+		}
 	}
 
 	//Send Response
@@ -314,6 +393,12 @@ async function API_GuildProducts (request, response) {
 
 async function API_UserProducts (request, response) {
 	//Check for missing data
+	if(!request.headers.token){
+		response.status(400)
+		return response.send({
+			"error": "token is missing"
+		})
+	}
 	if(!request.query.robloxid){
 		response.status(400)
 		return response.send({
@@ -327,6 +412,14 @@ async function API_UserProducts (request, response) {
 		})
 	}
 
+	//Validate token
+	await client.guildSettings.ensure(`${request.query.guildid}.token`, '')
+	if(request.headers.token !== await client.guildSettings.get(`${request.query.guildid}.token`)){
+		response.status(404)
+		return response.send({
+			"error": "token is invalid"
+		})
+	}
 	//Validate user
 	let robloxInfo = await client.getUserInfo(request.query.robloxid)
 	if(robloxInfo.verified === false){
@@ -466,6 +559,14 @@ async function API_CreatePurchase (request, response) {
 		})
 	}
 
+	//Validate token
+	await client.guildSettings.ensure(`${request.body.guildid}.token`, '')
+	if(request.headers.token !== await client.guildSettings.get(`${request.body.guildid}.token`)){
+		response.status(404)
+		return response.send({
+			"error": "token is invalid"
+		})
+	}
 	//Validate user
 	let userInfo = await client.getUserInfo(request.body.robloxid)
 	if(userInfo.verified === false){
@@ -481,14 +582,7 @@ async function API_CreatePurchase (request, response) {
 			"error": "guild does not exist"
 		})
 	}
-	//Validate token
-	await client.guildSettings.ensure(`${request.body.guildid}.token`, '')
-	if(request.headers.token !== await client.guildSettings.get(`${request.body.guildid}.token`)){
-		response.status(404)
-		return response.send({
-			"error": "token is invalid"
-		})
-	}
+
 	//Validate product
 	//Fetch products from DB
 	await client.products.ensure(request.body.guildid, {})
@@ -536,40 +630,43 @@ async function API_CreatePurchase (request, response) {
 		let guild = client.guilds.cache.get(request.body.guildid)
 
 		const embed = new Discord.MessageEmbed()
-        .setColor('BLACK')
+        .setColor(client.config.mainEmbedColor)
         .setTitle('You have purchased: ' + product.name)
         .addField('Download Link:', product.file)
         .setFooter(guild.name, guild.iconURL())
 		await user.send(embed)
-
-		//Log
-    	//Ensure data
-    	await client.guildSettings.ensure(request.body.guildid, {
-			logchannel: ''
-		})
-  
-		//Get Channel
-		let logchannel = await client.guildSettings.get(`${request.body.guildid}.logchannel`)
-  
-		if(logchannel){
-			//Send Log Message
-			try{
-				const logembed = new Discord.MessageEmbed()
-				.setColor(client.config.mainEmbedColor)
-				.setTitle('Product Purchased')
-				.addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
-				.addField('Discord User', userInfo.discordID)
-				.addField('Product', product.name)
-				.setTimestamp()
-				guild.channels.cache.get(logchannel).send(logembed)
-			}
-			catch(error){
-				console.log(`I could not log the purchase of "${product.name}" in guild "${request.body.guildid}"`)
-			}
-		}
 	}
 	catch(error){
 		dmerror = true
+	}
+
+	//Log
+	//Ensure data
+	await client.guildSettings.ensure(request.body.guildid, {
+		logchannel: ''
+	})
+
+	//Get Channel
+	let logchannel = await client.guildSettings.get(`${request.body.guildid}.logchannel`)
+
+	if(logchannel){
+		//Send Log Message
+		try{
+			let guild = client.guilds.cache.get(request.body.guildid)
+
+			const logembed = new Discord.MessageEmbed()
+			.setColor('BLUE')
+			.setTitle('Product Purchased')
+			.addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
+			.addField('Discord User', userInfo.discordID)
+			.addField('Product', product.name)
+			.setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${userInfo.robloxID}&width=420&height=420&format=png`)
+			.setTimestamp()
+			guild.channels.cache.get(logchannel).send(logembed)
+		}
+		catch(error){
+			console.log(`I could not log the purchase of "${product.name}" in guild "${request.body.guildid}"`)
+		}
 	}
 
 	//Send response

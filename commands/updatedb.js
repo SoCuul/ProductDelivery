@@ -28,6 +28,7 @@ module.exports = {
                             description: 'No description provided',
                             productid: 'N/A',
                             file: 'No file provided',
+                            image: '',
                             stock: false,
                             stockamount: 0
                         }

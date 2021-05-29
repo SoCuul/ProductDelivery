@@ -20,6 +20,7 @@ module.exports = {
             .addField('Description', product.description)
             .addField('Developer Product ID', product.productid)
             .addField('File', product.file)
+            .addField('Image', product.image || 'None',)
             .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
             if(product.stock){
@@ -40,16 +41,17 @@ module.exports = {
                 //Send Log Message
                 try{
                     const logembed = new Discord.MessageEmbed()
-                    .setColor(client.config.mainEmbedColor)
+                    .setColor('RED')
                     .setTitle('Product Deleted')
                     .addField('Name', product.name)
                     .addField('Description', product.description)
                     .addField('Developer Product ID', product.productid)
                     .addField('File', product.file)
+                    .addField('Image', product.image || 'None',)
                     .addField('Stock Status', product.stock ? 'Enabled' : 'Disabled', true)
                     .setTimestamp()
                     if(product.stock){
-                        embed.addField('Stock Amount', product.stockamount, true)
+                        logembed.addField('Stock Amount', product.stockamount, true)
                     }
                     message.guild.channels.cache.get(logchannel).send(logembed)
                 }

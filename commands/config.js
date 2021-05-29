@@ -88,7 +88,7 @@ module.exports = {
                     const embed2 = new Discord.MessageEmbed()
                     .setColor(client.config.mainEmbedColor)
                     .setTitle(client.config.botName + ' Token Configuration')
-                    .setDescription(`Please enter a custom API token that will be used to authenticate purchases or \`none\`.`)
+                    .setDescription(`Please enter a custom API token that will be used to authenticate guild-specific API requests or \`none\`.`)
                     .setFooter(`Respond with "cancel" to cancel the prompt.`, '')
                     await msg1.reactions.removeAll().catch(error => message.channel.send('Could not clear reactions. Continue with the prompt.'));
                     await msg1.edit(embed2)
@@ -113,7 +113,7 @@ module.exports = {
                         const success = new Discord.MessageEmbed()
                         .setColor('GREEN')
                         .setTitle(client.config.botName + ' Configuration Success')
-                        .setDescription('API purchasing has been disabled.')
+                        .setDescription('Guild-specific API requests have been disabled.')
                         await client.guildSettings.delete(`${message.guild.id}.token`)
                         return message.channel.send(success)
                     }
@@ -131,7 +131,7 @@ module.exports = {
                         const success = new Discord.MessageEmbed()
                         .setColor('GREEN')
                         .setTitle(client.config.botName + ' Configuration Success')
-                        .setDescription(`The bot will only allow purchases with the \`${messagecollected.first().content}\` token.`)
+                        .setDescription(`The bot will only allow guild-specific API requests with the \`${messagecollected.first().content}\` token.`)
                         return message.channel.send(success)
                     }
                 }

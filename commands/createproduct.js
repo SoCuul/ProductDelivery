@@ -1,11 +1,12 @@
 module.exports = {
-    aliases: [],
+    aliases: ['newproduct'],
 	async run(client, message, args, sendError) {
         const Discord = require("discord.js");
         let name
         let description
         let productid
         let file
+        let image
         let stock
         let stockamount = 0
 
@@ -47,8 +48,8 @@ module.exports = {
                 message.channel.send('Sorry, but your response must contain text. Please restart the command.')
                 return
             }
-            else if(prompt2.first().content.length > 2000) {
-                message.channel.send('Sorry, but your response must be under 2000 characters. Please restart the command.')
+            else if(prompt2.first().content.length > 1024) {
+                message.channel.send('Sorry, but your response must be under 1024 characters. Please restart the command.')
                 return
             }
             else if (prompt2.first().content.toLowerCase() == 'cancel') {
@@ -91,21 +92,42 @@ module.exports = {
             }
 
             //Prompt 5
-            await message.channel.send('> **Part 5**\n> Should the product have limited stock?\n> Respond with `yes` or `no`.\n> Enter `cancel` to cancel.')
+            await message.channel.send('> **Part 5**\n> Please send a Roblox asset ID of a product image, or `none`.\n> Enter `cancel` to cancel.')
             let prompt5 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
             if(!prompt5.first().content){
                 message.channel.send('Sorry, but your response must contain text. Please restart the command.')
                 return
             }
+            else if(prompt5.first().content.length > 30) {
+                message.channel.send('Sorry, but your response must be under 30 characters. Please restart the command.')
+                return
+            }
             else if (prompt5.first().content.toLowerCase() == 'cancel') {
+                return message.channel.send('**Product Creation Canceled**')
+            }
+            else if(prompt5.first().content.toLowerCase() == 'none'){
+                image = ''
+            }
+            else{
+                image = prompt5.first().content
+            }
+
+            //Prompt 6
+            await message.channel.send('> **Part 6**\n> Should the product have limited stock?\n> Respond with `yes` or `no`.\n> Enter `cancel` to cancel.')
+            let prompt6 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
+            if(!prompt6.first().content){
+                message.channel.send('Sorry, but your response must contain text. Please restart the command.')
+                return
+            }
+            else if (prompt6.first().content.toLowerCase() == 'cancel') {
                 return message.channel.send('**Product Creation Canceled**')
             }
             else{
                 //Parse option
-                if(prompt5.first().content.toLowerCase() === 'yes'){
+                if(prompt6.first().content.toLowerCase() === 'yes'){
                     stock = true
                 }
-                else if(prompt5.first().content.toLowerCase() === 'no'){
+                else if(prompt6.first().content.toLowerCase() === 'no'){
                     stock = false
                 }
                 else{
@@ -114,27 +136,27 @@ module.exports = {
                 }
             }
 
-            //Prompt 6
+            //Prompt 7
             if(stock){
-                await message.channel.send('> **Part 6**\n> How much stock should the product have?\n> Enter `cancel` to cancel.')
-                let prompt6 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
-                if(!prompt6.first().content || isNaN(prompt6.first().content)){
+                await message.channel.send('> **Part 7**\n> How much stock should the product have?\n> Enter `cancel` to cancel.')
+                let prompt7 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
+                if(!prompt7.first().content || isNaN(prompt7.first().content)){
                     message.channel.send('Sorry, but your response must be a number. Please restart the command.')
                     return
                 }
-                else if(Number(prompt6.first().content) > 1000){
+                else if(Number(prompt7.first().content) > 1000){
                     message.channel.send('Sorry, but your response must be a number less than 1000. Please restart the command.')
                     return
                 }
-                else if(Number(prompt6.first().content) < 1){
+                else if(Number(prompt7.first().content) < 1){
                     message.channel.send('Sorry, but your response must be a number larger than 0. Please restart the command.')
                     return
                 }
-                else if (prompt6.first().content.toLowerCase() == 'cancel') {
+                else if (prompt7.first().content.toLowerCase() == 'cancel') {
                     return message.channel.send('**Product Creation Canceled**')
                 }
                 else{
-                    stockamount = Number(prompt6.first().content)
+                    stockamount = Number(prompt7.first().content)
                 }
             }
 
@@ -146,6 +168,7 @@ module.exports = {
                 description: description,
                 productid: productid,
                 file: file,
+                image: image,
                 stock: stock,
                 stockamount: stockamount
             })
@@ -157,6 +180,7 @@ module.exports = {
             .addField('Description', description)
             .addField('Developer Product ID', productid)
             .addField('File', file)
+            .addField('Image', image || 'None',)
             .addField('Stock Status', stock ? 'Enabled' : 'Disabled', true)
             .setTimestamp()
             if(stock){
@@ -177,12 +201,13 @@ module.exports = {
                 //Send Log Message
                 try{
                     const logembed = new Discord.MessageEmbed()
-                    .setColor(client.config.mainEmbedColor)
+                    .setColor('GREEN')
                     .setTitle('Product Created')
                     .addField('Name', name)
                     .addField('Description', description)
                     .addField('Developer Product ID', productid)
                     .addField('File', file)
+                    .addField('Image', image || 'None',)
                     .addField('Stock Status', stock ? 'Enabled' : 'Disabled', true)
                     .setTimestamp()
                     if(stock){

@@ -1,4 +1,13 @@
 module.exports = (client) => {
-    console.log(`${client.config.botName} is online.`);
-	client.user.setActivity(client.config.activityStatus, { type: client.config.activityType })
+    console.log(`${client.config.botName} is online.`)
+
+    //Set first status
+    client.user.setActivity(client.config.activityStatus, { type: client.config.activityType })
+    .catch('[Status Error] Could not set status')
+
+    //Set status each hour
+    setInterval(() => {
+        client.user.setActivity(client.config.activityStatus, { type: client.config.activityType })
+        .catch('[Status Error] Could not set status')
+    }, 3600000);
 };
