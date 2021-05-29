@@ -313,6 +313,14 @@ async function API_ProductWhitelist (request, response) {
 	await client.usersdb.ensure(`${request.query.robloxid}.${request.query.guildid}`, [])
 	let myproducts = await client.usersdb.get(`${request.query.robloxid}.${request.query.guildid}`)
 
+	//Check if requested product exists
+	if(!allproducts[request.query.productname]){
+		response.status(404)
+		return response.send({
+			"error": "product does not exist"
+		})
+	}
+
 	//Get valid products
 	let productnames = []
 	for(product in myproducts){
