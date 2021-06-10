@@ -7,7 +7,7 @@ module.exports = {
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('❌ You need the `Administrator` permission to run this command.')
 
         if(!args[0] && !mentions[0]) return sendError('What\'s the Roblox ID/mention of the source user?||mergeaccount <source robloxid/mention> <target robloxid/mention>')
-        if(!args[1] && !mentions[1]) return sendError('What\'s the Roblox ID/mention of the source user?||mergeaccount <source robloxid/mention> <target robloxid/mention>')
+        if(!args[1] && !mentions[1]) return sendError('What\'s the Roblox ID/mention of the target user?||mergeaccount <source robloxid/mention> <target robloxid/mention>')
 
         //Check Verification
         //Source
