@@ -7,6 +7,7 @@ module.exports = {
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('❌ You need the `Administrator` permission to run this command.')
         
         if(!productname) return sendError('What product should I delete? (Case-Sensitive)||deleteproduct <productname>')
+        if(productname.includes('.')) return sendError('Product names can not contain the `.` character.||deleteproduct <productname>')
 
         //Get product from DB
         await client.products.ensure(message.guild.id, {})
@@ -62,7 +63,7 @@ module.exports = {
       
             await client.products.delete(`${message.guild.id}.${productname}`)
         }else{
-            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||deleteproduct <name>')
+            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||deleteproduct <productname>')
         }
     }
 };

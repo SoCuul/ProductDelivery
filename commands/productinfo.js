@@ -6,7 +6,7 @@ module.exports = {
 
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('❌ You need the `Administrator` permission to run this command.')
 
-        if(!productname) return sendError('What is the product\'s name? (Case-Sensitive)||giveproduct <productname>')
+        if(!productname) return sendError('What is the product\'s name? (Case-Sensitive)||productinfo <productname>')
 
         //Get Product
         await client.products.ensure(message.guild.id, {})
@@ -28,7 +28,7 @@ module.exports = {
             }
             message.channel.send(embed)
         }else{
-            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||giveproduct <productname>')
+            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||productinfo <productname>')
         }
     }
 };

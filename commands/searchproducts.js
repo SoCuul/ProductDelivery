@@ -25,27 +25,24 @@ module.exports = {
         let productnames = unsortedproductnames.sort()
 
         //Generate product pages
-        let productpages = []
-        let productint = 0
+        let productpage = []
         let leftout = 0
 
         for(i in productnames){
             let product = productnames[i]
 
-            if(!productpages[productint]) productpages[productint] = []
-
-            if(productpages[productint].join('\n').length + product.length > 2000){
+            if(productpage.join('\n').length + product.length > 2000){
                 leftout++
             }
             else{
-                productpages[productint].push(product)
+                productpage.push(product)
             }
         }
-        if(leftout === 1){
-            productpages[productint].push(`**${leftout} result could not be displayed**`)
+        if (leftout === 1){
+            productpage.push(`**${leftout} result could not be displayed**`)
         }
         else if (leftout > 1){
-            productpages[productint].push(`**${leftout} results could not be displayed**`)
+            productpage.push(`**${leftout} results could not be displayed**`)
         }
         
         //Send message
@@ -63,7 +60,7 @@ module.exports = {
         const embed = new Discord.MessageEmbed()
         .setColor(client.config.mainEmbedColor)
         .setTitle(`Products containing: ${search}`)
-        .setDescription(productpages[0] ? productpages[0].join('\n') : '**None**')
+        .setDescription(productpage.length ? productpage.join('\n') : '**None**')
         .setTimestamp()
         message.channel.send(embed)
     }

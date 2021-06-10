@@ -12,6 +12,7 @@ module.exports = {
 
         //Verify Product
         if(!productname) return sendError('What product should be modified?||modifyproduct <productname>')
+        if(productname.includes('.')) return sendError('Product names can not contain the `.` character.||modifyproduct <productname>')
         if(!currentproducts[productname]) return sendError('That\'s not a valid product.||modifyproduct <productname>')
   
         //Prompt

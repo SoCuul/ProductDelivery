@@ -8,6 +8,7 @@ module.exports = {
 
         if(!args[0] && !message.mentions.users.first()) return sendError('What\'s the Roblox ID/mention of the person to give the product to?||giveproduct <robloxid/mention> <productname>')
         if(!productname) return sendError('What is the product\'s name? (Case-Sensitive)||giveproduct <robloxid/mention> <productname>')
+        if(productname.includes('.')) return sendError('Product names can not contain the `.` character.||giveproduct <robloxid/mention> <productname>')
 
         //Check Verification
         let userInfo = message.mentions.users.first() ?  await getRobloxInfo(message.mentions.users.first().id) : await getUserInfo(args[0])
@@ -27,7 +28,7 @@ module.exports = {
                 .setColor('GREEN')
                 .setTitle('Product Given')
                 .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
-                .addField('Discord User', userInfo.discordID)
+                .addField('Discord User', `<@${userInfo.discordID}> (${userInfo.discordID})`)
                 .addField('Product', productname)
                 .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${userInfo.robloxID}&width=420&height=420&format=png`)
                 .setTimestamp()
@@ -49,7 +50,7 @@ module.exports = {
                         .setColor('GREEN')
                         .setTitle('Product Given')
                         .addField('Roblox User', `${userInfo.robloxUsername} (${userInfo.robloxID})`)
-                        .addField('Discord User', userInfo.discordID)
+                        .addField('Discord User', `<@${userInfo.discordID}> (${userInfo.discordID})`)
                         .addField('Product', productname)
                         .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${userInfo.robloxID}&width=420&height=420&format=png`)
                         .setTimestamp()

@@ -1,5 +1,5 @@
 module.exports = {
-  aliases: ['recieve'],
+  aliases: ['recieve', 'retrieveproduct'],
 	async run(client, message, args, sendError, getUserInfo, getRobloxInfo) {
         const Discord = require("discord.js");
         let productname = args.join(' ')
@@ -21,6 +21,7 @@ module.exports = {
         if(!userInfo.verified) return message.channel.send(unverified)
 
         if(!productname) return sendError('What product should I retrieve for you? (Case-Sensitive)||retrieve <productname>')
+        if(productname.includes('.')) return sendError('Product names can not contain the `.` character.||retrieve <productname>')
 
         await client.usersdb.ensure(`${userInfo.robloxID}`, {})
         await client.usersdb.ensure(`${userInfo.robloxID}.${message.guild.id}`, [])
@@ -41,10 +42,10 @@ module.exports = {
                 .setFooter(message.guild.name, message.guild.iconURL())
                 await message.member.send(embed).catch(error => { message.channel.send(`❌ I could not send you the file. Make sure you dms are open, and try the command again.`) })
             }else{
-                return sendError('You don\'t own this product. If you bought the product, make sure you spelt it correctly (Case-Sensitive).||giveproduct <id> <productname>')
+                return sendError('You don\'t own this product. If you bought the product, make sure you spelt it correctly (Case-Sensitive).||retrieve <productname>')
             }
         }else{
-            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||giveproduct <id> <productname>')
+            return sendError('That\'s not a valid product. Make sure you spelt it correctly (Case-Sensitive).||retrieve <productname>')
         }
     }
 };

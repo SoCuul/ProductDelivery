@@ -37,6 +37,9 @@ module.exports = {
             else if (prompt1.first().content.toLowerCase() == 'cancel') {
                 return message.channel.send('**Product Creation Canceled**')
             }
+            else if (prompt1.first().content.includes('.')) {
+                return message.channel.send('Product names can not contain the `.` character. Please restart the command.')
+            }
             else{
                 name = prompt1.first().content
             }

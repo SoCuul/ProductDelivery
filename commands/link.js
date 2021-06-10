@@ -55,16 +55,16 @@ module.exports = {
                         url: `https://users.roblox.com/v1/users/${checkusername.data.data[0].id}`,
                     })
 
-                    //Create emoji string out of discord id
-                    let encodingarray = ["✈️", "😄", "🐷", "🐶", "🍎", "😎",  "🤯", "😂", "🏝️", "😮"]
+                    //Create verification string out of discord id
+                    let encodingarray = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta",  "eta", "theta", "iota", "kappa"]
 					let splitid = message.member.id.split('')
 					let encodedid = []
 					for (i in splitid){
 						encodedid.push(encodingarray[splitid[i]])
 					}
-					let verificationcode = encodedid.join(' ') || 'Verification Code: ' + endodedid.join(' ')
+					let verificationcode = encodedid.join(' ')
 
-					if(response.data.description.split('\n').includes(verificationcode)){
+					if(response.data.description.includes(verificationcode) || response.data.description.includes(`Verification code: ${verificationcode}`)){
                         //Save to database
                         await client.robloxLink.set(message.author.id, {
                             "robloxID": `${response.data.id}`,
@@ -82,7 +82,7 @@ module.exports = {
 						const failureembed = new Discord.MessageEmbed()
 						.setColor('RED')
 						.setTitle(`Link Account`)
-						.setDescription(`Please set your roblox about page to the following text.\nAfter you do this, run this command again.\n\`${verificationcode}\``)
+						.setDescription(`Please set your roblox about page to the following text.\nAfter you do this, run this command again.\n\n\`\`\`\n${verificationcode}\n\`\`\``)
 						.setImage('https://i.imgur.com/gBjhWkk.png')
 						return verifymsg.edit(failureembed)
 					}
