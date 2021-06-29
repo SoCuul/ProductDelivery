@@ -10,7 +10,7 @@ client.config = config;
 //Load env
 require('dotenv').config()
 
-/* Load all events */
+//Load events
 fs.readdir('./events/', (_err, files) => {
 	files.forEach(file => {
 		if (!file.endsWith('.js')) return;
@@ -23,14 +23,36 @@ fs.readdir('./events/', (_err, files) => {
 
 client.commands = new Discord.Collection();
 
-/* Load commands */
-fs.readdir('./commands/', (_err, files) => {
+//Load main commands
+fs.readdir('./commands/main/', (_err, files) => {
 	files.forEach(file => {
 		if (!file.endsWith('.js')) return;
-		let props = require(`./commands/${file}`);
+		let props = require(`./commands/main/${file}`);
 		let commandName = file.split('.')[0];
 		client.commands.set(commandName, props);
-		console.log(`👌 Command loaded: ${commandName}`);
+		console.log(`Main command loaded: ${commandName}`);
+	});
+});
+
+//Load admin commands
+fs.readdir('./commands/admin/', (_err, files) => {
+	files.forEach(file => {
+		if (!file.endsWith('.js')) return;
+		let props = require(`./commands/admin/${file}`);
+		let commandName = file.split('.')[0];
+		client.commands.set(commandName, props);
+		console.log(`Admin command loaded: ${commandName}`);
+	});
+});
+
+//Load other commands
+fs.readdir('./commands/other/', (_err, files) => {
+	files.forEach(file => {
+		if (!file.endsWith('.js')) return;
+		let props = require(`./commands/other/${file}`);
+		let commandName = file.split('.')[0];
+		client.commands.set(commandName, props);
+		console.log(`Other command loaded: ${commandName}`);
 	});
 });
 
@@ -129,54 +151,54 @@ if(client.config.dbType.toLowerCase() === 'mongo'){
 						"headers": {'accept': 'application/vnd.github.v3+json'}
 					})
 
-					//Parse response
-					if(updaterequest.response){
-						console.log('[Update Checker] No releases could be found. Please try again later.')
+					//Compare versions
+					//Current Version
+					let unparsedcurrentversion = require('./package.json').version
+					let currentversion = unparsedcurrentversion.replace(/\./g, "")
+					//Repo Version
+					let unparsedrepoversion = updaterequest.data.tag_name
+					let repoversion = unparsedrepoversion.replace(/\./g, "")
+
+					//Check for numbers
+					if(isNaN(currentversion) || isNaN(repoversion)){
+						console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
 					}else{
-						//Compare versions
-						//Current Version
-						let unparsedcurrentversion = require('./package.json').version
-						let currentversion = unparsedcurrentversion.replace(/\./g, "")
-						//Repo Version
-						let unparsedrepoversion = updaterequest.data.tag_name
-						let repoversion = unparsedrepoversion.replace(/\./g, "")
+						if(Number(repoversion) > Number(currentversion)){
+							console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
+							console.log(`[Update Checker] Current Version: ${unparsedcurrentversion}`)
+							console.log(`[Update Checker] New Version: ${unparsedrepoversion}`)
 
-						//Check for numbers
-						if(isNaN(currentversion) || isNaN(repoversion)){
-							console.log('[Update Checker] Could not parse version numbers. Make sure the package.json file is untouched.')
-						}else{
-							if(Number(repoversion) > Number(currentversion)){
-								console.log('[Update Checker] There is a new version. Download it from: https://github.com/SoCuul/ProductDelivery/releases/latest')
-								console.log(`[Update Checker] Current Version: ${unparsedcurrentversion}`)
-								console.log(`[Update Checker] New Version: ${unparsedrepoversion}`)
-
-								//Notify owner
-								if(client.config.ownerID && !isNaN(client.config.ownerID)){
-									try{
-										//Fetch bot owner
-										let botOwner = await client.users.fetch(client.config.ownerID)
-										const reminderEmbed = new Discord.MessageEmbed()
-										.setColor(client.config.mainEmbedColor)
-										.setThumbnail(client.user.avatarURL())
-										.setTitle('Update Available')
-										.addField('Current Version', unparsedcurrentversion)
-										.addField('New Version', unparsedrepoversion)
-										.addField('Download', 'https://github.com/SoCuul/ProductDelivery/releases/latest')
-										.setTimestamp()
-										botOwner.send(reminderEmbed)
-									}
-									catch(error){
-										console.log('[Update Reminder] Could not notify bot owner')
-									}
+							//Notify owner
+							if(client.config.ownerID && !isNaN(client.config.ownerID)){
+								try{
+									//Fetch bot owner
+									let botOwner = await client.users.fetch(client.config.ownerID)
+									const reminderEmbed = new Discord.MessageEmbed()
+									.setColor(client.config.mainEmbedColor)
+									.setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
+									.setTitle('Update Available')
+									.addField('Current Version', unparsedcurrentversion)
+									.addField('New Version', unparsedrepoversion)
+									.addField('Download', 'https://github.com/SoCuul/ProductDelivery/releases/latest')
+									.setTimestamp()
+									botOwner.send(reminderEmbed)
 								}
-							}else{
-								console.log('[Update Checker] You are up to date!')
+								catch(error){
+									console.log('[Update Reminder] Could not notify bot owner')
+								}
 							}
+						}else{
+							console.log('[Update Checker] You are up to date!')
 						}
 					}
 				}
 				catch(error){
-					console.log('[Update Checker] There was an error checking for updates')
+					if(error.response && error.response.data && error.response.data.message){
+						console.log('[Update Checker] No releases could be found. Please try again later.')
+					}
+					else{
+						console.log('[Update Checker] There was an error checking for updates')
+					}
 				}
 				//Try again in 24 hours
 				setTimeout(updateChecker, 86400000)
@@ -267,14 +289,14 @@ app.get('/information/guild/', API_GuildDiscordInfo)
 app.post('/purchase/', API_CreatePurchase)
 
 async function API_Docs (request, response) {
-	response.redirect('https://productdelivery.socuul.dev/bot-info/api-endpoints/')
+	response.redirect('https://productdelivery.socuul.dev/api/endpoints/')
 }
 
 async function API_ProductWhitelist (request, response) {
 	if(!request.query.robloxid){
 		response.status(400)
 		return response.send({
-			"error": "productname is missing"
+			"error": "robloxid is missing"
 		})
 	}
 	else if(!request.query.guildid){
@@ -287,6 +309,26 @@ async function API_ProductWhitelist (request, response) {
 		response.status(400)
 		return response.send({
 			"error": "productname is missing"
+		})
+	}
+
+	//Check types
+	if(typeof request.query.robloxid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "robloxid must be a string"
+		})
+	}
+	else if(typeof request.query.guildid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "guildid must be a string"
+		})
+	}
+	else if(typeof request.query.productname !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "productname must be a string"
 		})
 	}
 
@@ -355,6 +397,20 @@ async function API_GuildProducts (request, response) {
 		})
 	}
 
+	//Check types
+	if(typeof request.headers.token !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "token must be a string"
+		})
+	}
+	else if(typeof request.query.guildid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "guildid must be a string"
+		})
+	}
+
 	//Validate token
 	await client.guildSettings.ensure(`${request.query.guildid}.token`, '')
 	if(request.headers.token !== await client.guildSettings.get(`${request.query.guildid}.token`)){
@@ -420,6 +476,26 @@ async function API_UserProducts (request, response) {
 		})
 	}
 
+	//Check types
+	if(typeof request.headers.token !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "token must be a string"
+		})
+	}
+	if(typeof request.query.robloxid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "robloxid must be a string"
+		})
+	}
+	else if(typeof request.query.guildid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "guildid must be a string"
+		})
+	}
+
 	//Validate token
 	await client.guildSettings.ensure(`${request.query.guildid}.token`, '')
 	if(request.headers.token !== await client.guildSettings.get(`${request.query.guildid}.token`)){
@@ -473,6 +549,14 @@ async function API_UserDiscordInfo (request, response) {
 		})
 	}
 
+	//Check types
+	if(typeof request.query.robloxid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "robloxid must be a string"
+		})
+	}
+
 	//Validate user
 	let userInfo = await client.getUserInfo(request.query.robloxid)
 	if(userInfo.verified === false){
@@ -492,7 +576,7 @@ async function API_UserDiscordInfo (request, response) {
         	"username": user.username,
         	"descrim": user.discriminator,
         	"tag": user.tag,
-        	"avatar": user.displayAvatarURL({"format": "jpg"})
+        	"avatar": user.displayAvatarURL({ "format": "jpg" })
 		})
 	}
 	catch(error){
@@ -509,6 +593,14 @@ async function API_GuildDiscordInfo (request, response) {
 		response.status(400)
 		return response.send({
 			"error": "guildid is missing"
+		})
+	}
+
+	//Check types
+	else if(typeof request.query.guildid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "guildid must be a string"
 		})
 	}
 
@@ -564,6 +656,32 @@ async function API_CreatePurchase (request, response) {
 		response.status(400)
 		return response.send({
 			"error": "productname is missing"
+		})
+	}
+
+	//Check types
+	if(typeof request.headers.token !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "token must be a string"
+		})
+	}
+	if(typeof request.body.robloxid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "robloxid must be a string"
+		})
+	}
+	else if(typeof request.body.guildid !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "guildid must be a string"
+		})
+	}
+	else if(typeof request.body.productname !== "string"){
+		response.status(400)
+		return response.send({
+			"error": "productname must be a string"
 		})
 	}
 

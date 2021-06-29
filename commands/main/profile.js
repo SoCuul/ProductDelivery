@@ -1,5 +1,5 @@
 module.exports = {
-    aliases: ['myproducts', 'my'],
+    aliases: ['myproducts'],
     async run(client, message, args, sendError, getUserInfo, getRobloxInfo) {
         const Discord = require("discord.js");
     

@@ -78,30 +78,33 @@ module.exports = {
 						.setDescription(`Your account has been linked.\nLinked Account: [**${response.data.name}**](https://www.roblox.com/users/${response.data.id}/profile)\nYou can now remove the verification text from your profile.`)
 						.setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${response.data.id}&width=420&height=420&format=png`)
 						return verifymsg.edit(successembed)
-					}else{
+					}
+					else{
 						const failureembed = new Discord.MessageEmbed()
 						.setColor('RED')
 						.setTitle(`Link Account`)
 						.setDescription(`Please set your roblox about page to the following text.\nAfter you do this, run this command again.\n\n\`\`\`\n${verificationcode}\n\`\`\``)
-						.setImage('https://i.imgur.com/gBjhWkk.png')
+						.setImage('https://i.imgur.com/SIuTOGg.png')
 						return verifymsg.edit(failureembed)
 					}
-                } catch (error) {
+                }
+				catch (error) {
                     const failureembed = new Discord.MessageEmbed()
 					.setColor('RED')
 					.setTitle(`Link Account`)
 					.setDescription(`There was an error contacting Roblox. Please try again later. \nIf this error persists, contact an admin.`)
 					return verifymsg.edit(failureembed)
                 }
-			}else{
+			}
+			else{
 				const failureembed = new Discord.MessageEmbed()
 				.setColor('RED')
 				.setTitle(`Link Account`)
 				.setDescription('The provided username is invalid. Please make sure you spelt it correctly.')
 				return verifymsg.edit(failureembed)
 			}
-        } catch (error) {
-            console.log(error)
+        }
+		catch (error) {
             const failureembed = new Discord.MessageEmbed()
 			.setColor('RED')
 			.setTitle(`Link Account`)

@@ -19,6 +19,9 @@ module.exports = async (client, message) => {
     // Ignore all bots
     if (message.author.bot) return;
 
+    //Notify user of prefix on mention
+    if(message.mentions.users.first() && message.mentions.users.first().id === client.user.id) return message.channel.send(`My prefix for **${message.guild.name}** is \`${prefix}\``)
+
     // Ignore messages without prefixes
     const cmdPrefix = message.content.startsWith(prefix);
     if (!cmdPrefix) return;
