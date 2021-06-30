@@ -1,4 +1,4 @@
-![ProductDelivery](https://gist.githubusercontent.com/SoCuul/dee6c1d04cbac4c2060b867fa039d168/raw/8c5d568ae385f0f6516905087fa66549f4ebaa4e/Wordmark.svg)
+![ProductDelivery](https://gist.githubusercontent.com/SoCuul/dee6c1d04cbac4c2060b867fa039d168/raw/49417ae6552e75a301463cf4a24819e64be8a2aa/Wordmark.svg)
 
 ## [View Documentation](https://productdelivery.socuul.dev/)
 
