@@ -2,8 +2,8 @@ module.exports = async (client, message) => {
     //MessageEmbeds
     const { MessageEmbed } = require("discord.js");
 
-    //Ignore commands in dm channels
-    if (message.channel.type === 'dm' ) return;
+    //Ignore commands in dm channels & bots
+    if (message.channel.type === 'dm' && message.author.bot) return;
 
     //Ensure data
     await client.guildSettings.ensure(message.guild.id, {
@@ -16,11 +16,8 @@ module.exports = async (client, message) => {
     let getUserInfo = client.getUserInfo
     let getRobloxInfo = client.getRobloxInfo
 
-    // Ignore all bots
-    if (message.author.bot) return;
-
     //Notify user of prefix on mention
-    if(message.mentions.users.first() && message.mentions.users.first().id === client.user.id) return message.channel.send(`My prefix for **${message.guild.name}** is \`${prefix}\``)
+    if(message.content === `<@${client.user.id}>` || message.content === `<@!${client.user.id}>`) return message.channel.send(`My prefix for **${message.guild.name}** is \`${prefix}\``)
 
     // Ignore messages without prefixes
     const cmdPrefix = message.content.startsWith(prefix);

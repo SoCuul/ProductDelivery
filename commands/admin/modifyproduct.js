@@ -118,7 +118,7 @@ module.exports = {
                 const embed2 = new Discord.MessageEmbed()
                 .setColor(client.config.mainEmbedColor)
                 .setTitle('Modify Developer Product ID')
-                .setDescription(`Please enter a developer product ID for the product.`)
+                .setDescription(`Please enter a developer product ID for the product (or FREE).`)
                 .setFooter(`Respond with "cancel" to cancel the prompt.`, '')
                 await msg1.reactions.removeAll().catch(error => message.channel.send('Could not clear reactions. Continue with the prompt.'));
                 await msg1.edit(embed2)

@@ -63,7 +63,7 @@ module.exports = {
             }
 
             //Prompt 3
-            await message.channel.send('> **Part 3**\n> What is the developer product ID?\n> https://developer.roblox.com/en-us/articles/Developer-Products-In-Game-Purchases\n> Enter `cancel` to cancel.')
+            await message.channel.send('> **Part 3**\n> What is the developer product ID (or FREE)?\n> https://developer.roblox.com/en-us/articles/Developer-Products-In-Game-Purchases\n> Enter `cancel` to cancel.')
             let prompt3 = await message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 1800000})
             if(!prompt3.first().content){
                 message.channel.send('Sorry, but your response must contain text. Please restart the command.')
