@@ -1,3 +1,8 @@
+# Deprecation Notice
+As of September 2022, this project has been abandoned. I would not reccomend using the codebase for your personal bot, as it is not very resilient and may have bugs.
+The purchase hub (in roblox) was never completed either, which makes this bot not very useful.
+No support will be provided for any self-hosted use of this bot.
+
 ![ProductDelivery](https://gist.githubusercontent.com/SoCuul/dee6c1d04cbac4c2060b867fa039d168/raw/49417ae6552e75a301463cf4a24819e64be8a2aa/Wordmark.svg)
 
 ## [View Documentation](https://productdelivery.socuul.dev/)
